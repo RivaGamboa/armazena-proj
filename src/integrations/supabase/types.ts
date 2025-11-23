@@ -14,7 +14,144 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      historico_movimentacoes: {
+        Row: {
+          alocacao_anterior: Database["public"]["Enums"]["alocacao_enum"] | null
+          alocacao_nova: Database["public"]["Enums"]["alocacao_enum"] | null
+          data_operacao: string
+          id: number
+          id_item: number | null
+          observacoes: string | null
+          quantidade_alterada: number | null
+          status_anterior:
+            | Database["public"]["Enums"]["status_item_enum"]
+            | null
+          status_novo: Database["public"]["Enums"]["status_item_enum"] | null
+          tipo_operacao: string
+          user_id: string
+        }
+        Insert: {
+          alocacao_anterior?:
+            | Database["public"]["Enums"]["alocacao_enum"]
+            | null
+          alocacao_nova?: Database["public"]["Enums"]["alocacao_enum"] | null
+          data_operacao?: string
+          id?: number
+          id_item?: number | null
+          observacoes?: string | null
+          quantidade_alterada?: number | null
+          status_anterior?:
+            | Database["public"]["Enums"]["status_item_enum"]
+            | null
+          status_novo?: Database["public"]["Enums"]["status_item_enum"] | null
+          tipo_operacao: string
+          user_id: string
+        }
+        Update: {
+          alocacao_anterior?:
+            | Database["public"]["Enums"]["alocacao_enum"]
+            | null
+          alocacao_nova?: Database["public"]["Enums"]["alocacao_enum"] | null
+          data_operacao?: string
+          id?: number
+          id_item?: number | null
+          observacoes?: string | null
+          quantidade_alterada?: number | null
+          status_anterior?:
+            | Database["public"]["Enums"]["status_item_enum"]
+            | null
+          status_novo?: Database["public"]["Enums"]["status_item_enum"] | null
+          tipo_operacao?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_movimentacoes_id_item_fkey"
+            columns: ["id_item"]
+            isOneToOne: false
+            referencedRelation: "itens_em_estoque"
+            referencedColumns: ["id_item"]
+          },
+        ]
+      }
+      itens_em_estoque: {
+        Row: {
+          alocacao: Database["public"]["Enums"]["alocacao_enum"]
+          categoria_item: Database["public"]["Enums"]["categoria_item_enum"]
+          comprimento_cm: number | null
+          data_cadastro: string
+          descricao_item: string | null
+          id_item: number
+          imagem_item: string | null
+          largura_cm: number | null
+          last_sync: string | null
+          nome_item: string
+          offline_operations: Json | null
+          peso_kg: number | null
+          profundidade_cm: number | null
+          quantidade_danificado: number
+          quantidade_em_manutencao: number
+          quantidade_novo: number
+          quantidade_total: number | null
+          quantidade_usado: number
+          status_item: Database["public"]["Enums"]["status_item_enum"]
+          sync_status: string | null
+          ultima_atualizacao: string
+          user_id: string
+          video_item: string | null
+        }
+        Insert: {
+          alocacao?: Database["public"]["Enums"]["alocacao_enum"]
+          categoria_item: Database["public"]["Enums"]["categoria_item_enum"]
+          comprimento_cm?: number | null
+          data_cadastro?: string
+          descricao_item?: string | null
+          id_item?: number
+          imagem_item?: string | null
+          largura_cm?: number | null
+          last_sync?: string | null
+          nome_item: string
+          offline_operations?: Json | null
+          peso_kg?: number | null
+          profundidade_cm?: number | null
+          quantidade_danificado?: number
+          quantidade_em_manutencao?: number
+          quantidade_novo?: number
+          quantidade_total?: number | null
+          quantidade_usado?: number
+          status_item?: Database["public"]["Enums"]["status_item_enum"]
+          sync_status?: string | null
+          ultima_atualizacao?: string
+          user_id: string
+          video_item?: string | null
+        }
+        Update: {
+          alocacao?: Database["public"]["Enums"]["alocacao_enum"]
+          categoria_item?: Database["public"]["Enums"]["categoria_item_enum"]
+          comprimento_cm?: number | null
+          data_cadastro?: string
+          descricao_item?: string | null
+          id_item?: number
+          imagem_item?: string | null
+          largura_cm?: number | null
+          last_sync?: string | null
+          nome_item?: string
+          offline_operations?: Json | null
+          peso_kg?: number | null
+          profundidade_cm?: number | null
+          quantidade_danificado?: number
+          quantidade_em_manutencao?: number
+          quantidade_novo?: number
+          quantidade_total?: number | null
+          quantidade_usado?: number
+          status_item?: Database["public"]["Enums"]["status_item_enum"]
+          sync_status?: string | null
+          ultima_atualizacao?: string
+          user_id?: string
+          video_item?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +160,21 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      alocacao_enum: "DEPOSITO" | "EVENTO" | "FUNCIONARIO"
+      categoria_item_enum:
+        | "Estruturas Metálicas"
+        | "Iluminação"
+        | "Áudio/Vídeo"
+        | "Ferramentas Manuais"
+        | "Ferramentas Elétricas"
+        | "Materiais de Consumo"
+        | "Mobiliário"
+        | "Sinalização Gráfica"
+        | "Decorativos"
+        | "Equipamentos de Segurança"
+        | "Elétricos"
+        | "Diversos"
+      status_item_enum: "NOVO" | "USADO" | "DANIFICADO" | "EM_MANUTENCAO"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +301,23 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      alocacao_enum: ["DEPOSITO", "EVENTO", "FUNCIONARIO"],
+      categoria_item_enum: [
+        "Estruturas Metálicas",
+        "Iluminação",
+        "Áudio/Vídeo",
+        "Ferramentas Manuais",
+        "Ferramentas Elétricas",
+        "Materiais de Consumo",
+        "Mobiliário",
+        "Sinalização Gráfica",
+        "Decorativos",
+        "Equipamentos de Segurança",
+        "Elétricos",
+        "Diversos",
+      ],
+      status_item_enum: ["NOVO", "USADO", "DANIFICADO", "EM_MANUTENCAO"],
+    },
   },
 } as const
