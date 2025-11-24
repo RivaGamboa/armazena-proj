@@ -208,18 +208,10 @@ export type Database = {
       alocacao_enum: "DEPOSITO" | "EVENTO" | "FUNCIONARIO"
       app_role: "admin" | "user"
       categoria_item_enum:
-        | "Estruturas Metálicas"
-        | "Iluminação"
-        | "Áudio/Vídeo"
-        | "Ferramentas Manuais"
-        | "Ferramentas Elétricas"
-        | "Materiais de Consumo"
-        | "Mobiliário"
-        | "Sinalização Gráfica"
-        | "Decorativos"
-        | "Equipamentos de Segurança"
-        | "Elétricos"
-        | "Diversos"
+        | "Ferramentas"
+        | "Materiais"
+        | "Equipamentos"
+        | "Consumíveis"
       status_item_enum: "NOVO" | "USADO" | "DANIFICADO" | "EM_MANUTENCAO"
     }
     CompositeTypes: {
@@ -351,18 +343,10 @@ export const Constants = {
       alocacao_enum: ["DEPOSITO", "EVENTO", "FUNCIONARIO"],
       app_role: ["admin", "user"],
       categoria_item_enum: [
-        "Estruturas Metálicas",
-        "Iluminação",
-        "Áudio/Vídeo",
-        "Ferramentas Manuais",
-        "Ferramentas Elétricas",
-        "Materiais de Consumo",
-        "Mobiliário",
-        "Sinalização Gráfica",
-        "Decorativos",
-        "Equipamentos de Segurança",
-        "Elétricos",
-        "Diversos",
+        "Ferramentas",
+        "Materiais",
+        "Equipamentos",
+        "Consumíveis",
       ],
       status_item_enum: ["NOVO", "USADO", "DANIFICADO", "EM_MANUTENCAO"],
     },

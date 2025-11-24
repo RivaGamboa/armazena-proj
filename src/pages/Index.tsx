@@ -16,16 +16,22 @@ const Index = () => {
       (event, session) => {
         setSession(session);
         setLoading(false);
+        if (session) {
+          navigate("/menu");
+        }
       }
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
+      if (session) {
+        navigate("/menu");
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (!loading && !session) {
