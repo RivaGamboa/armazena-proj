@@ -59,7 +59,9 @@ const ConsultarEstoque = () => {
 
     const filtered = itens.filter(item => 
       item.nome_item.toLowerCase().includes(value.toLowerCase()) ||
-      item.id_item.toString().includes(value)
+      item.id_item.toString().includes(value) ||
+      (item as any).sku?.toLowerCase().includes(value.toLowerCase()) ||
+      item.categoria_item.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredItens(filtered);
   };
@@ -119,7 +121,7 @@ const ConsultarEstoque = () => {
             <div className="relative">
               <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
-                placeholder="Escanear QR Code ou buscar..."
+                placeholder="Buscar por SKU, nome, ID ou categoria..."
                 className="pl-10 h-12"
                 value={busca}
                 onChange={(e) => handleSearch(e.target.value)}
@@ -173,6 +175,11 @@ const ConsultarEstoque = () => {
                 )}
                 
                 <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-mono text-xs text-muted-foreground">
+                      SKU {(item as any).sku || 'N/A'}
+                    </span>
+                  </div>
                   <h3 className="font-semibold text-lg">{item.nome_item}</h3>
                   <p className="text-sm text-muted-foreground">{item.categoria_item}</p>
                   <div className="flex gap-4 mt-2 text-sm">

@@ -94,6 +94,7 @@ export type Database = {
           quantidade_novo: number
           quantidade_total: number | null
           quantidade_usado: number
+          sku: string | null
           status_item: Database["public"]["Enums"]["status_item_enum"]
           sync_status: string | null
           ultima_atualizacao: string
@@ -119,6 +120,7 @@ export type Database = {
           quantidade_novo?: number
           quantidade_total?: number | null
           quantidade_usado?: number
+          sku?: string | null
           status_item?: Database["public"]["Enums"]["status_item_enum"]
           sync_status?: string | null
           ultima_atualizacao?: string
@@ -144,6 +146,7 @@ export type Database = {
           quantidade_novo?: number
           quantidade_total?: number | null
           quantidade_usado?: number
+          sku?: string | null
           status_item?: Database["public"]["Enums"]["status_item_enum"]
           sync_status?: string | null
           ultima_atualizacao?: string
@@ -196,6 +199,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_sku: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
