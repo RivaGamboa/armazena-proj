@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Camera, Video, Tag, Printer } from "lucide-react";
+import { ArrowLeft, Camera, Video, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
+import { LabelGenerator } from "@/components/LabelGenerator";
 
 const CadastrarItem = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const CadastrarItem = () => {
   const itemId = searchParams.get("id");
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showLabelGenerator, setShowLabelGenerator] = useState(false);
   const [formData, setFormData] = useState({
     sku: "",
     nome_item: "",
@@ -205,6 +207,14 @@ const CadastrarItem = () => {
                 <Label className="text-xs text-muted-foreground">SKU</Label>
                 <div className="text-3xl font-bold">{formData.sku}</div>
               </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowLabelGenerator(true)}
+              >
+                <Tag className="h-4 w-4 mr-2" />
+                Gerar Etiqueta
+              </Button>
             </div>
             <div className="flex items-center justify-around gap-4 p-4 bg-background rounded-lg">
               <div className="text-center">
@@ -394,6 +404,15 @@ const CadastrarItem = () => {
             {loading ? "Salvando..." : isEditMode ? "Atualizar Item" : "Salvar Item"}
           </Button>
         </form>
+
+        {formData.sku && (
+          <LabelGenerator
+            sku={formData.sku}
+            itemName={formData.nome_item}
+            isOpen={showLabelGenerator}
+            onClose={() => setShowLabelGenerator(false)}
+          />
+        )}
       </div>
     </div>
   );
