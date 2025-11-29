@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -13,6 +13,8 @@ const RetirarItem = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [itens, setItens] = useState<any[]>([]);
+  const [filteredItens, setFilteredItens] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
   const [quantidade, setQuantidade] = useState(0);
   const [destino, setDestino] = useState("EVENTO");
@@ -26,9 +28,26 @@ const RetirarItem = () => {
     const { data } = await supabase
       .from('itens_em_estoque')
       .select('*')
+      .eq('alocacao', 'DEPOSITO')
       .order('nome_item');
-    setItens(data || []);
+    const items = data || [];
+    setItens(items);
+    setFilteredItens(items);
   };
+
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredItens(itens);
+      return;
+    }
+    
+    const filtered = itens.filter(item =>
+      item.nome_item.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.id_item.toString().includes(searchTerm)
+    );
+    setFilteredItens(filtered);
+  }, [searchTerm, itens]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,15 +106,28 @@ const RetirarItem = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
+            <Label>Buscar Item</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Digite SKU, nome ou ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <div>
             <Label htmlFor="item">Item *</Label>
             <Select value={selectedItem} onValueChange={setSelectedItem}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um item" />
               </SelectTrigger>
               <SelectContent>
-                {itens.map(item => (
+                {filteredItens.map(item => (
                   <SelectItem key={item.id_item} value={item.id_item.toString()}>
-                    {item.nome_item} ({item.alocacao})
+                    SKU {item.sku} - {item.nome_item} (Disp: {item.quantidade_novo + item.quantidade_usado})
                   </SelectItem>
                 ))}
               </SelectContent>

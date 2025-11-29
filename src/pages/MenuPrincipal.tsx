@@ -27,12 +27,12 @@ const MenuPrincipal = () => {
 
         <div className="bg-card rounded-2xl shadow-xl p-8 space-y-4">
           <Button
-            onClick={() => navigate("/cadastrar")}
-            className="w-full h-20 text-lg flex items-center justify-start gap-4 bg-primary hover:bg-primary/90"
+            onClick={() => navigate("/consultar")}
+            className="w-full h-20 text-lg flex items-center justify-start gap-4 bg-blue-600 hover:bg-blue-700"
             size="lg"
           >
-            <FileText className="h-8 w-8" />
-            <span>CADASTRAR ITEM</span>
+            <Search className="h-8 w-8" />
+            <span>CONSULTAR ITEM</span>
           </Button>
 
           <Button
@@ -41,7 +41,7 @@ const MenuPrincipal = () => {
             size="lg"
           >
             <PackageMinus className="h-8 w-8" />
-            <span>RETIRAR ITEM (SAÍDA)</span>
+            <span>RETIRAR ITEM</span>
           </Button>
 
           <Button
@@ -54,12 +54,12 @@ const MenuPrincipal = () => {
           </Button>
 
           <Button
-            onClick={() => navigate("/consultar")}
-            className="w-full h-20 text-lg flex items-center justify-start gap-4 bg-blue-600 hover:bg-blue-700"
+            onClick={() => navigate("/cadastrar")}
+            className="w-full h-20 text-lg flex items-center justify-start gap-4 bg-primary hover:bg-primary/90"
             size="lg"
           >
-            <Search className="h-8 w-8" />
-            <span>CONSULTAR ESTOQUE</span>
+            <FileText className="h-8 w-8" />
+            <span>CADASTRAR/EDITAR ITEM</span>
           </Button>
         </div>
 

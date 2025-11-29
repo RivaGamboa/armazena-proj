@@ -1,18 +1,24 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Camera, Video } from "lucide-react";
+import { ArrowLeft, Camera, Video, Tag, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import QRCodeSVG from "react-qr-code";
+import Barcode from "react-barcode";
 
 const CadastrarItem = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const itemId = searchParams.get("id");
   const [loading, setLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({
+    sku: "",
     nome_item: "",
     categoria_item: "Ferramentas",
     descricao_item: "",
@@ -28,6 +34,46 @@ const CadastrarItem = () => {
   });
   const [imagemFile, setImagemFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (itemId) {
+      loadItem(itemId);
+      setIsEditMode(true);
+    }
+  }, [itemId]);
+
+  const loadItem = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("itens_em_estoque")
+        .select("*")
+        .eq("id_item", parseInt(id))
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setFormData({
+          sku: data.sku || "",
+          nome_item: data.nome_item,
+          categoria_item: data.categoria_item,
+          descricao_item: data.descricao_item || "",
+          status_item: data.status_item,
+          alocacao: data.alocacao,
+          quantidade_novo: data.quantidade_novo,
+          quantidade_usado: data.quantidade_usado,
+          quantidade_danificado: data.quantidade_danificado,
+          comprimento_cm: data.comprimento_cm || 0,
+          largura_cm: data.largura_cm || 0,
+          profundidade_cm: data.profundidade_cm || 0,
+          peso_kg: data.peso_kg || 0,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao carregar item");
+    }
+  };
 
   const handleImageCapture = () => {
     const input = document.createElement('input');
@@ -96,30 +142,41 @@ const CadastrarItem = () => {
         videoUrl = publicUrl;
       }
 
-      // Inserir item no banco
-      const { error } = await supabase
-        .from('itens_em_estoque')
-        .insert([{
-          nome_item: formData.nome_item,
-          categoria_item: formData.categoria_item as any,
-          descricao_item: formData.descricao_item,
-          status_item: formData.status_item as any,
-          alocacao: formData.alocacao as any,
-          quantidade_novo: formData.quantidade_novo,
-          quantidade_usado: formData.quantidade_usado,
-          quantidade_danificado: formData.quantidade_danificado,
-          comprimento_cm: formData.comprimento_cm,
-          largura_cm: formData.largura_cm,
-          profundidade_cm: formData.profundidade_cm,
-          peso_kg: formData.peso_kg,
-          user_id: user.id,
-          imagem_item: imagemUrl,
-          video_item: videoUrl,
-        }]);
+      const itemData = {
+        nome_item: formData.nome_item,
+        categoria_item: formData.categoria_item as any,
+        descricao_item: formData.descricao_item,
+        status_item: formData.status_item as any,
+        alocacao: formData.alocacao as any,
+        quantidade_novo: formData.quantidade_novo,
+        quantidade_usado: formData.quantidade_usado,
+        quantidade_danificado: formData.quantidade_danificado,
+        comprimento_cm: formData.comprimento_cm,
+        largura_cm: formData.largura_cm,
+        profundidade_cm: formData.profundidade_cm,
+        peso_kg: formData.peso_kg,
+        user_id: user.id,
+        ...(imagemUrl && { imagem_item: imagemUrl }),
+        ...(videoUrl && { video_item: videoUrl }),
+      };
 
-      if (error) throw error;
+      if (isEditMode && itemId) {
+        const { error } = await supabase
+          .from('itens_em_estoque')
+          .update(itemData)
+          .eq('id_item', parseInt(itemId));
 
-      toast.success("Item cadastrado com sucesso!");
+        if (error) throw error;
+        toast.success("Item atualizado com sucesso!");
+      } else {
+        const { error } = await supabase
+          .from('itens_em_estoque')
+          .insert([itemData]);
+
+        if (error) throw error;
+        toast.success("Item cadastrado com sucesso!");
+      }
+
       navigate("/menu");
     } catch (error) {
       console.error(error);
@@ -136,8 +193,31 @@ const CadastrarItem = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/menu")}>
             <ArrowLeft className="h-6 w-6" />
           </Button>
-          <h1 className="text-2xl font-bold">Cadastrar Item</h1>
+          <h1 className="text-2xl font-bold">
+            {isEditMode ? "Editar Item" : "Cadastrar/Editar Item"}
+          </h1>
         </div>
+
+        {formData.sku && (
+          <div className="bg-card p-6 rounded-lg mb-6 border">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <Label className="text-xs text-muted-foreground">SKU</Label>
+                <div className="text-3xl font-bold">{formData.sku}</div>
+              </div>
+            </div>
+            <div className="flex items-center justify-around gap-4 p-4 bg-background rounded-lg">
+              <div className="text-center">
+                <Label className="text-xs text-muted-foreground mb-2 block">QR Code</Label>
+                <QRCodeSVG value={formData.sku} size={80} />
+              </div>
+              <div className="text-center">
+                <Label className="text-xs text-muted-foreground mb-2 block">Código de Barras</Label>
+                <Barcode value={formData.sku} height={40} width={1.2} fontSize={10} />
+              </div>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -311,7 +391,7 @@ const CadastrarItem = () => {
           </div>
 
           <Button type="submit" className="w-full h-14 text-lg" disabled={loading}>
-            {loading ? "Salvando..." : "Salvar Item"}
+            {loading ? "Salvando..." : isEditMode ? "Atualizar Item" : "Salvar Item"}
           </Button>
         </form>
       </div>
