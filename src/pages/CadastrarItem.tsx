@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Camera, Video, Tag } from "lucide-react";
+import { ArrowLeft, Camera, Video, Tag, ScanBarcode } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
 import { LabelGenerator } from "@/components/LabelGenerator";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 const CadastrarItem = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const CadastrarItem = () => {
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showLabelGenerator, setShowLabelGenerator] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const [formData, setFormData] = useState({
     sku: "",
     nome_item: "",
@@ -99,6 +101,45 @@ const CadastrarItem = () => {
       if (file) setVideoFile(file);
     };
     input.click();
+  };
+
+  const handleScanResult = async (code: string) => {
+    // Buscar item pelo SKU
+    try {
+      const { data, error } = await supabase
+        .from("itens_em_estoque")
+        .select("*")
+        .eq("sku", code)
+        .single();
+
+      if (error) {
+        toast.error("Item não encontrado");
+        return;
+      }
+
+      if (data) {
+        setFormData({
+          sku: data.sku || "",
+          nome_item: data.nome_item,
+          categoria_item: data.categoria_item,
+          descricao_item: data.descricao_item || "",
+          status_item: data.status_item,
+          alocacao: data.alocacao,
+          quantidade_novo: data.quantidade_novo,
+          quantidade_usado: data.quantidade_usado,
+          quantidade_danificado: data.quantidade_danificado,
+          comprimento_cm: data.comprimento_cm || 0,
+          largura_cm: data.largura_cm || 0,
+          profundidade_cm: data.profundidade_cm || 0,
+          peso_kg: data.peso_kg || 0,
+        });
+        setIsEditMode(true);
+        toast.success("Item carregado com sucesso!");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao buscar item");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -195,9 +236,17 @@ const CadastrarItem = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/menu")}>
             <ArrowLeft className="h-6 w-6" />
           </Button>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold flex-1">
             {isEditMode ? "Editar Item" : "Cadastrar/Editar Item"}
           </h1>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowScanner(true)}
+            title="Escanear item existente"
+          >
+            <ScanBarcode className="h-5 w-5" />
+          </Button>
         </div>
 
         {formData.sku && (
@@ -413,6 +462,12 @@ const CadastrarItem = () => {
             onClose={() => setShowLabelGenerator(false)}
           />
         )}
+
+        <BarcodeScanner
+          isOpen={showScanner}
+          onClose={() => setShowScanner(false)}
+          onScan={handleScanResult}
+        />
       </div>
     </div>
   );

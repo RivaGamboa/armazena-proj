@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileText, PackageMinus, PackagePlus, Search, LogOut } from "lucide-react";
+import { FileText, PackageMinus, PackagePlus, Search, LogOut, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -26,6 +26,15 @@ const MenuPrincipal = () => {
         </div>
 
         <div className="bg-card rounded-2xl shadow-xl p-8 space-y-4">
+          <Button
+            onClick={() => navigate("/dashboard")}
+            className="w-full h-20 text-lg flex items-center justify-start gap-4 bg-purple-600 hover:bg-purple-700"
+            size="lg"
+          >
+            <BarChart3 className="h-8 w-8" />
+            <span>DASHBOARD</span>
+          </Button>
+
           <Button
             onClick={() => navigate("/consultar")}
             className="w-full h-20 text-lg flex items-center justify-start gap-4 bg-blue-600 hover:bg-blue-700"
