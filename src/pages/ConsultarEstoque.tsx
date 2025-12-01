@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, QrCode, MessageSquare, Send } from "lucide-react";
+import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 interface Item {
   id_item: number;
@@ -26,6 +27,7 @@ const ConsultarEstoque = () => {
   const [filteredItens, setFilteredItens] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     loadItens();
@@ -64,6 +66,11 @@ const ConsultarEstoque = () => {
       item.categoria_item.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredItens(filtered);
+  };
+
+  const handleScanResult = (code: string) => {
+    handleSearch(code);
+    setBusca(code);
   };
 
   const handleChatSubmit = async (e: React.FormEvent) => {
@@ -118,14 +125,25 @@ const ConsultarEstoque = () => {
           </div>
 
           <div className="space-y-3">
-            <div className="relative">
-              <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por SKU, nome, ID ou categoria..."
-                className="pl-10 h-12"
-                value={busca}
-                onChange={(e) => handleSearch(e.target.value)}
-              />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar por SKU, nome, ID ou categoria..."
+                  className="pl-10 h-12"
+                  value={busca}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                className="h-12 w-12"
+                onClick={() => setShowScanner(true)}
+              >
+                <ScanBarcode className="h-5 w-5" />
+              </Button>
             </div>
 
             <form onSubmit={handleChatSubmit} className="relative">
@@ -199,6 +217,12 @@ const ConsultarEstoque = () => {
           </div>
         )}
       </div>
+
+      <BarcodeScanner
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScan={handleScanResult}
+      />
     </div>
   );
 };

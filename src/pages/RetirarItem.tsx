@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, ScanBarcode } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 const RetirarItem = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const RetirarItem = () => {
   const [quantidade, setQuantidade] = useState(0);
   const [destino, setDestino] = useState("EVENTO");
   const [observacoes, setObservacoes] = useState("");
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     loadItens();
@@ -48,6 +50,10 @@ const RetirarItem = () => {
     );
     setFilteredItens(filtered);
   }, [searchTerm, itens]);
+
+  const handleScanResult = (code: string) => {
+    setSearchTerm(code);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,14 +113,24 @@ const RetirarItem = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label>Buscar Item</Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Digite SKU, nome ou ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Digite SKU, nome ou ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                onClick={() => setShowScanner(true)}
+              >
+                <ScanBarcode className="h-5 w-5" />
+              </Button>
             </div>
           </div>
 
@@ -171,6 +187,12 @@ const RetirarItem = () => {
             {loading ? "Processando..." : "Confirmar Retirada"}
           </Button>
         </form>
+
+        <BarcodeScanner
+          isOpen={showScanner}
+          onClose={() => setShowScanner(false)}
+          onScan={handleScanResult}
+        />
       </div>
     </div>
   );
