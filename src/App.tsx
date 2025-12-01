@@ -11,6 +11,7 @@ import CadastrarItem from "./pages/CadastrarItem";
 import ConsultarEstoque from "./pages/ConsultarEstoque";
 import RetirarItem from "./pages/RetirarItem";
 import DevolverItem from "./pages/DevolverItem";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Index />} />
           <Route path="/menu" element={<MenuPrincipal />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/cadastrar" element={<CadastrarItem />} />
           <Route path="/consultar" element={<ConsultarEstoque />} />
           <Route path="/retirar" element={<RetirarItem />} />
