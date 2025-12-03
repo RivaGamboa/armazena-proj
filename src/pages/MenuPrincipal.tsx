@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, PackageMinus, PackagePlus, Search, LogOut, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import NotificationBell from "@/components/NotificationBell";
 
 const MenuPrincipal = () => {
   const navigate = useNavigate();
@@ -15,6 +16,9 @@ const MenuPrincipal = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <NotificationBell />
+      </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">
