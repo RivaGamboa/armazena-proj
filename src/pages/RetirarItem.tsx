@@ -9,6 +9,7 @@ import { ArrowLeft, Search, ScanBarcode } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { ItemPreview } from "@/components/ItemPreview";
 
 const RetirarItem = () => {
   const navigate = useNavigate();
@@ -21,6 +22,8 @@ const RetirarItem = () => {
   const [destino, setDestino] = useState("EVENTO");
   const [observacoes, setObservacoes] = useState("");
   const [showScanner, setShowScanner] = useState(false);
+
+  const selectedItemData = itens.find(i => i.id_item.toString() === selectedItem);
 
   useEffect(() => {
     loadItens();
@@ -80,8 +83,9 @@ const RetirarItem = () => {
       const { error: histError } = await supabase
         .from('historico_movimentacoes')
         .insert([{
+          id_item: item.id_item,
           user_id: user.id,
-          tipo_operacao: 'SAIDA',
+          tipo_operacao: 'RETIRADA',
           quantidade_alterada: quantidade,
           alocacao_anterior: item.alocacao as any,
           alocacao_nova: destino as any,
@@ -149,6 +153,16 @@ const RetirarItem = () => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Preview do Item Selecionado */}
+          {selectedItemData && (
+            <ItemPreview
+              sku={selectedItemData.sku}
+              imagemUrl={selectedItemData.imagem_item}
+              videoUrl={selectedItemData.video_item}
+              compact
+            />
+          )}
 
           <div>
             <Label htmlFor="quantidade">Quantidade</Label>

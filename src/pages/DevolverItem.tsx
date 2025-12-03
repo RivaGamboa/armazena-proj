@@ -9,6 +9,7 @@ import { ArrowLeft, Search, ScanBarcode } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { ItemPreview } from "@/components/ItemPreview";
 
 const DevolverItem = () => {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ const DevolverItem = () => {
   const [selectedItem, setSelectedItem] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [showScanner, setShowScanner] = useState(false);
+
+  const selectedItemData = itens.find(i => i.id_item.toString() === selectedItem);
 
   useEffect(() => {
     loadItens();
@@ -77,6 +80,7 @@ const DevolverItem = () => {
       const { error: histError } = await supabase
         .from('historico_movimentacoes')
         .insert([{
+          id_item: item.id_item,
           user_id: user.id,
           tipo_operacao: 'DEVOLUCAO',
           alocacao_anterior: item.alocacao as any,
@@ -145,6 +149,16 @@ const DevolverItem = () => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Preview do Item Selecionado */}
+          {selectedItemData && (
+            <ItemPreview
+              sku={selectedItemData.sku}
+              imagemUrl={selectedItemData.imagem_item}
+              videoUrl={selectedItemData.video_item}
+              compact
+            />
+          )}
 
           <div>
             <Label htmlFor="obs">Observações</Label>
