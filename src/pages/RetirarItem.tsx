@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { ItemPreview } from "@/components/ItemPreview";
+import { useCustomEnums } from "@/hooks/useCustomEnums";
 
 const RetirarItem = () => {
   const navigate = useNavigate();
@@ -19,11 +20,22 @@ const RetirarItem = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
   const [quantidade, setQuantidade] = useState(0);
-  const [destino, setDestino] = useState("EVENTO");
+  const [destino, setDestino] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [showScanner, setShowScanner] = useState(false);
+  const { alocacoes } = useCustomEnums();
+
+  // Filtrar alocações que não são DEPOSITO (destinos válidos para retirada)
+  const destinoOptions = alocacoes.filter(a => a.nome !== "DEPOSITO");
 
   const selectedItemData = itens.find(i => i.id_item.toString() === selectedItem);
+
+  // Definir destino padrão quando opções carregarem
+  useEffect(() => {
+    if (destinoOptions.length > 0 && !destino) {
+      setDestino(destinoOptions[0].nome);
+    }
+  }, [destinoOptions]);
 
   useEffect(() => {
     loadItens();
@@ -178,11 +190,12 @@ const RetirarItem = () => {
             <Label htmlFor="destino">Destino *</Label>
             <Select value={destino} onValueChange={setDestino}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Selecione o destino" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="EVENTO">EVENTO</SelectItem>
-                <SelectItem value="FUNCIONARIO">FUNCIONÁRIO</SelectItem>
+                {destinoOptions.map((aloc) => (
+                  <SelectItem key={aloc.id} value={aloc.nome}>{aloc.nome}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

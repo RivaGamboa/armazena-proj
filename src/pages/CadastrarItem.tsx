@@ -13,6 +13,8 @@ import Barcode from "react-barcode";
 import { LabelGenerator } from "@/components/LabelGenerator";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { ItemPreview } from "@/components/ItemPreview";
+import { useCustomEnums } from "@/hooks/useCustomEnums";
+import { Constants } from "@/integrations/supabase/types";
 
 const CadastrarItem = () => {
   const navigate = useNavigate();
@@ -22,13 +24,26 @@ const CadastrarItem = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [showLabelGenerator, setShowLabelGenerator] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const { categorias, alocacoes, statusList, loading: enumsLoading } = useCustomEnums();
+  
+  // Fallback para ENUMs do sistema se não houver valores customizados
+  const categoriaOptions = categorias.length > 0 
+    ? categorias.map(c => c.nome) 
+    : Constants.public.Enums.categoria_item_enum;
+  const alocacaoOptions = alocacoes.length > 0 
+    ? alocacoes.map(a => a.nome) 
+    : Constants.public.Enums.alocacao_enum;
+  const statusOptions = statusList.length > 0 
+    ? statusList.map(s => s.nome) 
+    : Constants.public.Enums.status_item_enum;
+
   const [formData, setFormData] = useState({
     sku: "",
     nome_item: "",
-    categoria_item: "Ferramentas",
+    categoria_item: "",
     descricao_item: "",
-    status_item: "NOVO",
-    alocacao: "DEPOSITO",
+    status_item: "",
+    alocacao: "",
     quantidade_novo: 0,
     quantidade_usado: 0,
     quantidade_danificado: 0,
@@ -41,6 +56,18 @@ const CadastrarItem = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
+
+  // Definir valores padrão quando as opções carregarem
+  useEffect(() => {
+    if (!enumsLoading && !isEditMode && !formData.categoria_item) {
+      setFormData(prev => ({
+        ...prev,
+        categoria_item: categoriaOptions[0] || "Ferramentas",
+        alocacao: alocacaoOptions[0] || "DEPOSITO",
+        status_item: statusOptions[0] || "NOVO",
+      }));
+    }
+  }, [enumsLoading, isEditMode]);
 
   useEffect(() => {
     if (itemId) {
@@ -109,7 +136,6 @@ const CadastrarItem = () => {
   };
 
   const handleScanResult = async (code: string) => {
-    // Buscar item pelo SKU
     try {
       const { data, error } = await supabase
         .from("itens_em_estoque")
@@ -158,7 +184,6 @@ const CadastrarItem = () => {
       let imagemUrl = null;
       let videoUrl = null;
 
-      // Upload de imagem
       if (imagemFile) {
         const imagemPath = `${user.id}/${Date.now()}_${imagemFile.name}`;
         const { error: imagemError } = await supabase.storage
@@ -174,7 +199,6 @@ const CadastrarItem = () => {
         imagemUrl = publicUrl;
       }
 
-      // Upload de vídeo
       if (videoFile) {
         const videoPath = `${user.id}/${Date.now()}_${videoFile.name}`;
         const { error: videoError } = await supabase.storage
@@ -233,6 +257,14 @@ const CadastrarItem = () => {
       setLoading(false);
     }
   };
+
+  if (enumsLoading) {
+    return (
+      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
@@ -301,13 +333,12 @@ const CadastrarItem = () => {
               onValueChange={(value) => setFormData({ ...formData, categoria_item: value })}
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Ferramentas">Ferramentas</SelectItem>
-                <SelectItem value="Materiais">Materiais</SelectItem>
-                <SelectItem value="Equipamentos">Equipamentos</SelectItem>
-                <SelectItem value="Consumíveis">Consumíveis</SelectItem>
+                {categoriaOptions.map((cat) => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -330,12 +361,12 @@ const CadastrarItem = () => {
                 onValueChange={(value) => setFormData({ ...formData, status_item: value })}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione um status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="NOVO">NOVO</SelectItem>
-                  <SelectItem value="USADO">USADO</SelectItem>
-                  <SelectItem value="DANIFICADO">DANIFICADO</SelectItem>
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -347,12 +378,12 @@ const CadastrarItem = () => {
                 onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione uma alocação" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="DEPOSITO">DEPÓSITO</SelectItem>
-                  <SelectItem value="EVENTO">EVENTO</SelectItem>
-                  <SelectItem value="FUNCIONARIO">FUNCIONÁRIO</SelectItem>
+                  {alocacaoOptions.map((aloc) => (
+                    <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -433,7 +464,6 @@ const CadastrarItem = () => {
           </div>
 
           <div className="space-y-4">
-            {/* Preview de mídia existente */}
             {(existingImageUrl || existingVideoUrl) && !imagemFile && !videoFile && (
               <ItemPreview 
                 imagemUrl={existingImageUrl} 

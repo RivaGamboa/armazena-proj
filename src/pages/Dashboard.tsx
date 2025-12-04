@@ -7,22 +7,28 @@ import { ArrowLeft, Package, TrendingUp, AlertCircle, MapPin, Settings } from "l
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Constants } from "@/integrations/supabase/types";
+import { useCustomEnums } from "@/hooks/useCustomEnums";
+import { EnumManager } from "@/components/EnumManager";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const { categorias, alocacoes, statusList, refetch } = useCustomEnums();
   const [stats, setStats] = useState({
     total: 0,
     porCategoria: [] as any[],
     porStatus: [] as any[],
     porAlocacao: [] as any[],
   });
-
-  // Dados variáveis do sistema (enums)
-  const categorias = Constants.public.Enums.categoria_item_enum;
-  const alocacoes = Constants.public.Enums.alocacao_enum;
-  const statusList = Constants.public.Enums.status_item_enum;
+  const [itemCounts, setItemCounts] = useState<{
+    categorias: { [key: string]: number };
+    alocacoes: { [key: string]: number };
+    status: { [key: string]: number };
+  }>({
+    categorias: {},
+    alocacoes: {},
+    status: {},
+  });
 
   useEffect(() => {
     loadStats();
@@ -86,6 +92,12 @@ const Dashboard = () => {
         porStatus,
         porAlocacao,
       });
+
+      setItemCounts({
+        categorias: categoriasCount,
+        alocacoes: alocacoesCount,
+        status: statuses,
+      });
     } catch (error) {
       console.error(error);
       toast.error("Erro ao carregar estatísticas");
@@ -94,7 +106,7 @@ const Dashboard = () => {
     }
   };
 
-  const COLORS = ['#2e7d32', '#1b5e20', '#66bb6a', '#81c784', '#a5d6a7'];
+  const COLORS = ['hsl(var(--primary))', 'hsl(var(--primary) / 0.8)', 'hsl(var(--primary) / 0.6)', 'hsl(var(--primary) / 0.4)', 'hsl(var(--muted-foreground))'];
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
@@ -239,87 +251,37 @@ const Dashboard = () => {
 
             <TabsContent value="configuracoes" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Categorias */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Categorias</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Valores disponíveis para categorização de itens
-                    </p>
-                    <div className="space-y-2">
-                      {categorias.map((cat) => (
-                        <div 
-                          key={cat} 
-                          className="flex items-center justify-between p-2 bg-muted rounded-md"
-                        >
-                          <span className="text-sm font-medium">{cat}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {stats.porCategoria.find(c => c.name === cat)?.value || 0} itens
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <EnumManager
+                  title="Categorias"
+                  tableName="categorias_item"
+                  items={categorias}
+                  itemCounts={itemCounts.categorias}
+                  onRefresh={refetch}
+                />
 
-                {/* Alocações */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Alocações</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Locais onde os itens podem estar alocados
-                    </p>
-                    <div className="space-y-2">
-                      {alocacoes.map((aloc) => (
-                        <div 
-                          key={aloc} 
-                          className="flex items-center justify-between p-2 bg-muted rounded-md"
-                        >
-                          <span className="text-sm font-medium">{aloc}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {stats.porAlocacao.find(a => a.name === aloc)?.value || 0} itens
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <EnumManager
+                  title="Alocações"
+                  tableName="alocacoes"
+                  items={alocacoes}
+                  itemCounts={itemCounts.alocacoes}
+                  onRefresh={refetch}
+                />
 
-                {/* Status */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Status</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Estados possíveis para os itens do estoque
-                    </p>
-                    <div className="space-y-2">
-                      {statusList.map((status) => (
-                        <div 
-                          key={status} 
-                          className="flex items-center justify-between p-2 bg-muted rounded-md"
-                        >
-                          <span className="text-sm font-medium">{status}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {stats.porStatus.find(s => s.name === status)?.value || 0} itens
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <EnumManager
+                  title="Status"
+                  tableName="status_item"
+                  items={statusList}
+                  itemCounts={itemCounts.status}
+                  onRefresh={refetch}
+                  showColor
+                />
               </div>
 
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-sm text-muted-foreground text-center">
-                    Os valores de Categoria, Alocação e Status são definidos no sistema. 
-                    Para adicionar novos valores, entre em contato com o administrador do sistema.
+                    Adicione novos valores para Categoria, Alocação e Status conforme necessário.
+                    Valores em uso não podem ser excluídos.
                   </p>
                 </CardContent>
               </Card>
