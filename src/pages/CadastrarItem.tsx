@@ -12,6 +12,7 @@ import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
 import { LabelGenerator } from "@/components/LabelGenerator";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { ItemPreview } from "@/components/ItemPreview";
 
 const CadastrarItem = () => {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ const CadastrarItem = () => {
   });
   const [imagemFile, setImagemFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (itemId) {
@@ -72,6 +75,8 @@ const CadastrarItem = () => {
           profundidade_cm: data.profundidade_cm || 0,
           peso_kg: data.peso_kg || 0,
         });
+        setExistingImageUrl(data.imagem_item);
+        setExistingVideoUrl(data.video_item);
       }
     } catch (error) {
       console.error(error);
@@ -428,6 +433,15 @@ const CadastrarItem = () => {
           </div>
 
           <div className="space-y-4">
+            {/* Preview de mídia existente */}
+            {(existingImageUrl || existingVideoUrl) && !imagemFile && !videoFile && (
+              <ItemPreview 
+                imagemUrl={existingImageUrl} 
+                videoUrl={existingVideoUrl}
+                compact
+              />
+            )}
+
             <Button
               type="button"
               variant="outline"
@@ -435,7 +449,7 @@ const CadastrarItem = () => {
               onClick={handleImageCapture}
             >
               <Camera className="h-6 w-6 mr-2" />
-              {imagemFile ? `Foto: ${imagemFile.name}` : "Tirar Foto"}
+              {imagemFile ? `Foto: ${imagemFile.name}` : existingImageUrl ? "Alterar Foto" : "Tirar Foto"}
             </Button>
 
             <Button
@@ -445,7 +459,7 @@ const CadastrarItem = () => {
               onClick={handleVideoCapture}
             >
               <Video className="h-6 w-6 mr-2" />
-              {videoFile ? `Vídeo: ${videoFile.name}` : "Gravar Vídeo"}
+              {videoFile ? `Vídeo: ${videoFile.name}` : existingVideoUrl ? "Alterar Vídeo" : "Gravar Vídeo"}
             </Button>
           </div>
 
