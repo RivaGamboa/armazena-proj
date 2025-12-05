@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useCustomEnums } from "@/hooks/useCustomEnums";
 import { EnumManager } from "@/components/EnumManager";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -44,10 +45,8 @@ const Dashboard = () => {
 
       if (!itens) return;
 
-      // Total de itens
       const total = itens.length;
 
-      // Estatísticas por categoria
       const categoriasCount = itens.reduce((acc: any, item: any) => {
         const cat = item.categoria_item;
         if (!acc[cat]) acc[cat] = 0;
@@ -60,7 +59,6 @@ const Dashboard = () => {
         value,
       }));
 
-      // Estatísticas por status
       const statuses = itens.reduce((acc: any, item: any) => {
         const status = item.status_item;
         if (!acc[status]) acc[status] = 0;
@@ -73,7 +71,6 @@ const Dashboard = () => {
         value,
       }));
 
-      // Estatísticas por alocação
       const alocacoesCount = itens.reduce((acc: any, item: any) => {
         const aloc = item.alocacao;
         if (!acc[aloc]) acc[aloc] = 0;
@@ -106,7 +103,22 @@ const Dashboard = () => {
     }
   };
 
-  const COLORS = ['hsl(var(--primary))', 'hsl(var(--primary) / 0.8)', 'hsl(var(--primary) / 0.6)', 'hsl(var(--primary) / 0.4)', 'hsl(var(--muted-foreground))'];
+  // Vibrant color palette for charts
+  const CHART_COLORS = [
+    'hsl(var(--chart-1))',
+    'hsl(var(--chart-2))',
+    'hsl(var(--chart-3))',
+    'hsl(var(--chart-4))',
+    'hsl(var(--chart-5))',
+    'hsl(var(--chart-6))',
+  ];
+
+  const BAR_COLORS = [
+    '#22c55e', // green
+    '#3b82f6', // blue
+    '#f59e0b', // amber
+    '#8b5cf6', // purple
+  ];
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
@@ -115,63 +127,70 @@ const Dashboard = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/menu")}>
             <ArrowLeft className="h-6 w-6" />
           </Button>
-          <h1 className="text-2xl font-bold">Dashboard de Estoque</h1>
+          <h1 className="text-2xl font-bold flex-1 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Dashboard de Estoque
+          </h1>
+          <ThemeToggle />
         </div>
 
         {loading ? (
-          <p className="text-center text-muted-foreground">Carregando...</p>
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-pulse text-muted-foreground">Carregando...</div>
+          </div>
         ) : (
           <Tabs defaultValue="estatisticas" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="estatisticas">Estatísticas</TabsTrigger>
-              <TabsTrigger value="configuracoes">
+            <TabsList className="grid w-full grid-cols-2 h-12 p-1 bg-muted/50 rounded-xl">
+              <TabsTrigger value="estatisticas" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                Estatísticas
+              </TabsTrigger>
+              <TabsTrigger value="configuracoes" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
                 <Settings className="h-4 w-4 mr-2" />
                 Configurações
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="estatisticas" className="space-y-6">
+            <TabsContent value="estatisticas" className="space-y-6 animate-fade-in">
               {/* Cards de resumo */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20 hover:shadow-lg transition-shadow">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total de Itens</CardTitle>
-                    <Package className="h-4 w-4 text-muted-foreground" />
+                    <Package className="h-5 w-5 text-emerald-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.total}</div>
+                    <div className="text-3xl font-bold text-emerald-600">{stats.total}</div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20 hover:shadow-lg transition-shadow">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Categorias</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.porCategoria.length}</div>
+                    <div className="text-3xl font-bold text-blue-600">{stats.porCategoria.length}</div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20 hover:shadow-lg transition-shadow">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Em Depósito</CardTitle>
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <MapPin className="h-5 w-5 text-amber-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-3xl font-bold text-amber-600">
                       {stats.porAlocacao.find(a => a.name === 'DEPOSITO')?.value || 0}
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20 hover:shadow-lg transition-shadow">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Em Uso</CardTitle>
-                    <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                    <AlertCircle className="h-5 w-5 text-purple-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-3xl font-bold text-purple-600">
                       {(stats.porAlocacao.find(a => a.name === 'EVENTO')?.value || 0) +
                         (stats.porAlocacao.find(a => a.name === 'FUNCIONARIO')?.value || 0)}
                     </div>
@@ -182,30 +201,40 @@ const Dashboard = () => {
               {/* Gráficos */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Itens por Categoria */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Itens por Categoria</CardTitle>
+                <Card className="overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
+                    <CardTitle className="text-lg">Itens por Categoria</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-4">
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={stats.porCategoria}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
-                        <YAxis />
-                        <Tooltip />
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                          }}
+                        />
                         <Legend />
-                        <Bar dataKey="value" fill="hsl(var(--primary))" name="Quantidade" />
+                        <Bar dataKey="value" name="Quantidade" radius={[4, 4, 0, 0]}>
+                          {stats.porCategoria.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
+                          ))}
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
 
                 {/* Itens por Status */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Distribuição por Status</CardTitle>
+                <Card className="overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
+                    <CardTitle className="text-lg">Distribuição por Status</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-4">
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
                         <Pie
@@ -214,34 +243,52 @@ const Dashboard = () => {
                           cy="50%"
                           labelLine={false}
                           label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={80}
+                          outerRadius={100}
+                          innerRadius={40}
+                          paddingAngle={5}
                           fill="#8884d8"
                           dataKey="value"
                         >
                           {stats.porStatus.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                          }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
 
                 {/* Itens por Alocação */}
-                <Card className="md:col-span-2">
-                  <CardHeader>
-                    <CardTitle>Distribuição por Alocação</CardTitle>
+                <Card className="md:col-span-2 overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
+                    <CardTitle className="text-lg">Distribuição por Alocação</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-4">
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={stats.porAlocacao}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
+                      <BarChart data={stats.porAlocacao} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <YAxis dataKey="name" type="category" tick={{ fill: 'hsl(var(--muted-foreground))' }} width={100} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                          }}
+                        />
                         <Legend />
-                        <Bar dataKey="value" fill="hsl(var(--primary))" name="Quantidade" />
+                        <Bar dataKey="value" name="Quantidade" radius={[0, 4, 4, 0]}>
+                          {stats.porAlocacao.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
+                          ))}
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -249,39 +296,50 @@ const Dashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="configuracoes" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <EnumManager
-                  title="Categorias"
-                  tableName="categorias_item"
-                  items={categorias}
-                  itemCounts={itemCounts.categorias}
-                  onRefresh={refetch}
-                />
+            <TabsContent value="configuracoes" className="space-y-6 animate-fade-in">
+              <Tabs defaultValue="categorias" className="space-y-4">
+                <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+                  <TabsTrigger value="categorias">Categorias</TabsTrigger>
+                  <TabsTrigger value="alocacoes">Alocações</TabsTrigger>
+                  <TabsTrigger value="status">Status</TabsTrigger>
+                </TabsList>
 
-                <EnumManager
-                  title="Alocações"
-                  tableName="alocacoes"
-                  items={alocacoes}
-                  itemCounts={itemCounts.alocacoes}
-                  onRefresh={refetch}
-                />
+                <TabsContent value="categorias">
+                  <EnumManager
+                    title="Categorias"
+                    tableName="categorias_item"
+                    items={categorias}
+                    itemCounts={itemCounts.categorias}
+                    onRefresh={refetch}
+                  />
+                </TabsContent>
 
-                <EnumManager
-                  title="Status"
-                  tableName="status_item"
-                  items={statusList}
-                  itemCounts={itemCounts.status}
-                  onRefresh={refetch}
-                  showColor
-                />
-              </div>
+                <TabsContent value="alocacoes">
+                  <EnumManager
+                    title="Alocações"
+                    tableName="alocacoes"
+                    items={alocacoes}
+                    itemCounts={itemCounts.alocacoes}
+                    onRefresh={refetch}
+                  />
+                </TabsContent>
 
-              <Card>
+                <TabsContent value="status">
+                  <EnumManager
+                    title="Status"
+                    tableName="status_item"
+                    items={statusList}
+                    itemCounts={itemCounts.status}
+                    onRefresh={refetch}
+                    showColor
+                  />
+                </TabsContent>
+              </Tabs>
+
+              <Card className="bg-muted/30">
                 <CardContent className="pt-6">
                   <p className="text-sm text-muted-foreground text-center">
-                    Adicione novos valores para Categoria, Alocação e Status conforme necessário.
-                    Valores em uso não podem ser excluídos.
+                    Gerencie Categorias, Alocações e Status nas abas acima. Valores em uso não podem ser excluídos.
                   </p>
                 </CardContent>
               </Card>
