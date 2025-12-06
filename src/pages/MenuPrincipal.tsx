@@ -16,72 +16,73 @@ const MenuPrincipal = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
-      <div className="absolute top-4 right-4 flex items-center gap-2">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-3 sm:p-4 md:p-6">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2">
         <ThemeToggle />
         <NotificationBell />
       </div>
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
+      <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
             Gestão de Estoque
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Selecione uma opção abaixo
           </p>
         </div>
 
-        <div className="bg-card rounded-2xl shadow-xl p-6 space-y-3 border">
+        <div className="bg-card rounded-2xl shadow-xl p-4 sm:p-6 space-y-2 sm:space-y-3 border">
           <Button
             onClick={() => navigate("/dashboard")}
-            className="w-full h-16 text-lg flex items-center justify-start gap-4 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-md transition-all hover:shadow-lg hover:scale-[1.02]"
+            className="w-full h-14 sm:h-16 text-base sm:text-lg flex items-center justify-start gap-3 sm:gap-4 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] touch-target"
             size="lg"
           >
-            <BarChart3 className="h-7 w-7" />
+            <BarChart3 className="h-6 w-6 sm:h-7 sm:w-7" />
             <span>DASHBOARD</span>
           </Button>
 
           <Button
             onClick={() => navigate("/consultar")}
-            className="w-full h-16 text-lg flex items-center justify-start gap-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-md transition-all hover:shadow-lg hover:scale-[1.02]"
+            className="w-full h-14 sm:h-16 text-base sm:text-lg flex items-center justify-start gap-3 sm:gap-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] touch-target"
             size="lg"
           >
-            <Search className="h-7 w-7" />
+            <Search className="h-6 w-6 sm:h-7 sm:w-7" />
             <span>CONSULTAR ITEM</span>
           </Button>
 
           <Button
             onClick={() => navigate("/retirar")}
-            className="w-full h-16 text-lg flex items-center justify-start gap-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-md transition-all hover:shadow-lg hover:scale-[1.02]"
+            className="w-full h-14 sm:h-16 text-base sm:text-lg flex items-center justify-start gap-3 sm:gap-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] touch-target"
             size="lg"
           >
-            <PackageMinus className="h-7 w-7" />
+            <PackageMinus className="h-6 w-6 sm:h-7 sm:w-7" />
             <span>RETIRAR ITEM</span>
           </Button>
 
           <Button
             onClick={() => navigate("/devolver")}
-            className="w-full h-16 text-lg flex items-center justify-start gap-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 shadow-md transition-all hover:shadow-lg hover:scale-[1.02]"
+            className="w-full h-14 sm:h-16 text-base sm:text-lg flex items-center justify-start gap-3 sm:gap-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] touch-target"
             size="lg"
           >
-            <PackagePlus className="h-7 w-7" />
+            <PackagePlus className="h-6 w-6 sm:h-7 sm:w-7" />
             <span>DEVOLVER ITEM</span>
           </Button>
 
           <Button
             onClick={() => navigate("/cadastrar")}
-            className="w-full h-16 text-lg flex items-center justify-start gap-4 bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary/60 shadow-md transition-all hover:shadow-lg hover:scale-[1.02]"
+            className="w-full h-14 sm:h-16 text-base sm:text-lg flex items-center justify-start gap-3 sm:gap-4 bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary/60 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] touch-target"
             size="lg"
           >
-            <FileText className="h-7 w-7" />
-            <span>CADASTRAR/EDITAR ITEM</span>
+            <FileText className="h-6 w-6 sm:h-7 sm:w-7" />
+            <span className="hidden sm:inline">CADASTRAR/EDITAR ITEM</span>
+            <span className="sm:hidden">CADASTRAR/EDITAR</span>
           </Button>
         </div>
 
         <Button
           onClick={handleLogout}
           variant="ghost"
-          className="w-full mt-6 text-muted-foreground hover:text-foreground"
+          className="w-full mt-4 sm:mt-6 text-muted-foreground hover:text-foreground touch-target"
         >
           <LogOut className="h-4 w-4 mr-2" />
           Sair

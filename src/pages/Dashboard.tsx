@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Package, TrendingUp, AlertCircle, MapPin, Settings } from "lucide-react";
+import { ArrowLeft, Package, TrendingUp, AlertCircle, MapPin, Settings, FileBarChart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useCustomEnums } from "@/hooks/useCustomEnums";
 import { EnumManager } from "@/components/EnumManager";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
+import { ReportGenerator } from "@/components/ReportGenerator";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -121,13 +121,13 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-20">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/menu")}>
-            <ArrowLeft className="h-6 w-6" />
+    <div className="min-h-screen bg-background p-3 sm:p-4 md:p-6 pb-20">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="touch-target">
+            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
-          <h1 className="text-2xl font-bold flex-1 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold flex-1 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent truncate">
             Dashboard de Estoque
           </h1>
           <ThemeToggle />
@@ -138,59 +138,65 @@ const Dashboard = () => {
             <div className="animate-pulse text-muted-foreground">Carregando...</div>
           </div>
         ) : (
-          <Tabs defaultValue="estatisticas" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 h-12 p-1 bg-muted/50 rounded-xl">
-              <TabsTrigger value="estatisticas" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+          <Tabs defaultValue="estatisticas" className="space-y-4 sm:space-y-6">
+            <TabsList className="grid w-full grid-cols-3 h-10 sm:h-12 p-1 bg-muted/50 rounded-xl">
+              <TabsTrigger value="estatisticas" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
                 Estatísticas
               </TabsTrigger>
-              <TabsTrigger value="configuracoes" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                <Settings className="h-4 w-4 mr-2" />
-                Configurações
+              <TabsTrigger value="relatorios" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                <FileBarChart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Relatórios</span>
+                <span className="sm:hidden">Relat.</span>
+              </TabsTrigger>
+              <TabsTrigger value="configuracoes" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Configurações</span>
+                <span className="sm:hidden">Config.</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="estatisticas" className="space-y-6 animate-fade-in">
+            <TabsContent value="estatisticas" className="space-y-4 sm:space-y-6 animate-fade-in">
               {/* Cards de resumo */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
                 <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20 hover:shadow-lg transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total de Itens</CardTitle>
-                    <Package className="h-5 w-5 text-emerald-600" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium">Total de Itens</CardTitle>
+                    <Package className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-emerald-600">{stats.total}</div>
+                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-emerald-600">{stats.total}</div>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20 hover:shadow-lg transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Categorias</CardTitle>
-                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium">Categorias</CardTitle>
+                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-blue-600">{stats.porCategoria.length}</div>
+                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{stats.porCategoria.length}</div>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20 hover:shadow-lg transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Em Depósito</CardTitle>
-                    <MapPin className="h-5 w-5 text-amber-600" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium">Em Depósito</CardTitle>
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-amber-600">
+                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-600">
                       {stats.porAlocacao.find(a => a.name === 'DEPOSITO')?.value || 0}
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20 hover:shadow-lg transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Em Uso</CardTitle>
-                    <AlertCircle className="h-5 w-5 text-purple-600" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium">Em Uso</CardTitle>
+                    <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-purple-600">
+                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-600">
                       {(stats.porAlocacao.find(a => a.name === 'EVENTO')?.value || 0) +
                         (stats.porAlocacao.find(a => a.name === 'FUNCIONARIO')?.value || 0)}
                     </div>
@@ -199,18 +205,18 @@ const Dashboard = () => {
               </div>
 
               {/* Gráficos */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Itens por Categoria */}
                 <Card className="overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
-                    <CardTitle className="text-lg">Itens por Categoria</CardTitle>
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent px-3 sm:px-6 py-3 sm:py-4">
+                    <CardTitle className="text-sm sm:text-base md:text-lg">Itens por Categoria</CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-4">
-                    <ResponsiveContainer width="100%" height={300}>
+                  <CardContent className="pt-4 px-2 sm:px-6">
+                    <ResponsiveContainer width="100%" height={250}>
                       <BarChart data={stats.porCategoria}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                        <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                        <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} />
+                        <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: 'hsl(var(--card))',
@@ -218,7 +224,7 @@ const Dashboard = () => {
                             borderRadius: '8px',
                           }}
                         />
-                        <Legend />
+                        <Legend wrapperStyle={{ fontSize: 12 }} />
                         <Bar dataKey="value" name="Quantidade" radius={[4, 4, 0, 0]}>
                           {stats.porCategoria.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
@@ -231,11 +237,11 @@ const Dashboard = () => {
 
                 {/* Itens por Status */}
                 <Card className="overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
-                    <CardTitle className="text-lg">Distribuição por Status</CardTitle>
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent px-3 sm:px-6 py-3 sm:py-4">
+                    <CardTitle className="text-sm sm:text-base md:text-lg">Distribuição por Status</CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-4">
-                    <ResponsiveContainer width="100%" height={300}>
+                  <CardContent className="pt-4 px-2 sm:px-6">
+                    <ResponsiveContainer width="100%" height={250}>
                       <PieChart>
                         <Pie
                           data={stats.porStatus}
@@ -243,8 +249,8 @@ const Dashboard = () => {
                           cy="50%"
                           labelLine={false}
                           label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={100}
-                          innerRadius={40}
+                          outerRadius={80}
+                          innerRadius={30}
                           paddingAngle={5}
                           fill="#8884d8"
                           dataKey="value"
@@ -266,16 +272,16 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Itens por Alocação */}
-                <Card className="md:col-span-2 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
-                    <CardTitle className="text-lg">Distribuição por Alocação</CardTitle>
+                <Card className="lg:col-span-2 overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent px-3 sm:px-6 py-3 sm:py-4">
+                    <CardTitle className="text-sm sm:text-base md:text-lg">Distribuição por Alocação</CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-4">
-                    <ResponsiveContainer width="100%" height={300}>
+                  <CardContent className="pt-4 px-2 sm:px-6">
+                    <ResponsiveContainer width="100%" height={200}>
                       <BarChart data={stats.porAlocacao} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                        <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                        <YAxis dataKey="name" type="category" tick={{ fill: 'hsl(var(--muted-foreground))' }} width={100} />
+                        <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} />
+                        <YAxis dataKey="name" type="category" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} width={80} />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: 'hsl(var(--card))',
@@ -283,7 +289,7 @@ const Dashboard = () => {
                             borderRadius: '8px',
                           }}
                         />
-                        <Legend />
+                        <Legend wrapperStyle={{ fontSize: 12 }} />
                         <Bar dataKey="value" name="Quantidade" radius={[0, 4, 4, 0]}>
                           {stats.porAlocacao.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
@@ -294,6 +300,10 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+
+            <TabsContent value="relatorios" className="space-y-4 sm:space-y-6 animate-fade-in">
+              <ReportGenerator stats={stats} />
             </TabsContent>
 
             <TabsContent value="configuracoes" className="space-y-6 animate-fade-in">
