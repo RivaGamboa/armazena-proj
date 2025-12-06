@@ -6,8 +6,11 @@ import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode, Play } fro
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { AdvancedFilters, AdvancedFiltersState, initialFilters } from "@/components/AdvancedFilters";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
+import { Constants } from "@/integrations/supabase/types";
 
 interface Item {
   id_item: number;
@@ -21,6 +24,12 @@ interface Item {
   quantidade_novo: number;
   quantidade_usado: number;
   quantidade_danificado: number;
+  quantidade_total: number | null;
+  comprimento_cm: number | null;
+  largura_cm: number | null;
+  profundidade_cm: number | null;
+  peso_kg: number | null;
+  data_cadastro: string;
 }
 
 const ConsultarEstoque = () => {
@@ -33,6 +42,11 @@ const ConsultarEstoque = () => {
   const [chatLoading, setChatLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFiltersState>(initialFilters);
+
+  const categorias = Constants.public.Enums.categoria_item_enum;
+  const statusList = Constants.public.Enums.status_item_enum;
+  const alocacoes = Constants.public.Enums.alocacao_enum;
 
   useEffect(() => {
     loadItens();
@@ -59,18 +73,122 @@ const ConsultarEstoque = () => {
 
   const handleSearch = (value: string) => {
     setBusca(value);
-    if (!value.trim()) {
-      setFilteredItens(itens);
-      return;
+    applyAllFilters(value, advancedFilters);
+  };
+
+  const applyAllFilters = (searchValue: string, filters: AdvancedFiltersState) => {
+    let filtered = [...itens];
+
+    // Text search
+    if (searchValue.trim()) {
+      const search = searchValue.toLowerCase();
+      filtered = filtered.filter(item => 
+        item.nome_item.toLowerCase().includes(search) ||
+        item.id_item.toString().includes(search) ||
+        item.sku?.toLowerCase().includes(search) ||
+        item.categoria_item.toLowerCase().includes(search)
+      );
     }
 
-    const filtered = itens.filter(item => 
-      item.nome_item.toLowerCase().includes(value.toLowerCase()) ||
-      item.id_item.toString().includes(value) ||
-      item.sku?.toLowerCase().includes(value.toLowerCase()) ||
-      item.categoria_item.toLowerCase().includes(value.toLowerCase())
-    );
+    // Categoria
+    if (filters.categoria && filters.categoria !== "all") {
+      filtered = filtered.filter(item => item.categoria_item === filters.categoria);
+    }
+
+    // Status
+    if (filters.status && filters.status !== "all") {
+      filtered = filtered.filter(item => item.status_item === filters.status);
+    }
+
+    // Alocação
+    if (filters.alocacao && filters.alocacao !== "all") {
+      filtered = filtered.filter(item => item.alocacao === filters.alocacao);
+    }
+
+    // Data de cadastro
+    if (filters.dataInicio) {
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.data_cadastro);
+        return itemDate >= filters.dataInicio!;
+      });
+    }
+    if (filters.dataFim) {
+      const endDate = new Date(filters.dataFim);
+      endDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.data_cadastro);
+        return itemDate <= endDate;
+      });
+    }
+
+    // Quantidade total
+    if (filters.quantidadeMin) {
+      const min = parseInt(filters.quantidadeMin);
+      filtered = filtered.filter(item => {
+        const total = item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
+        return total >= min;
+      });
+    }
+    if (filters.quantidadeMax) {
+      const max = parseInt(filters.quantidadeMax);
+      filtered = filtered.filter(item => {
+        const total = item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
+        return total <= max;
+      });
+    }
+
+    // Dimensões - Comprimento
+    if (filters.comprimentoMin) {
+      const min = parseFloat(filters.comprimentoMin);
+      filtered = filtered.filter(item => item.comprimento_cm !== null && item.comprimento_cm >= min);
+    }
+    if (filters.comprimentoMax) {
+      const max = parseFloat(filters.comprimentoMax);
+      filtered = filtered.filter(item => item.comprimento_cm !== null && item.comprimento_cm <= max);
+    }
+
+    // Dimensões - Largura
+    if (filters.larguraMin) {
+      const min = parseFloat(filters.larguraMin);
+      filtered = filtered.filter(item => item.largura_cm !== null && item.largura_cm >= min);
+    }
+    if (filters.larguraMax) {
+      const max = parseFloat(filters.larguraMax);
+      filtered = filtered.filter(item => item.largura_cm !== null && item.largura_cm <= max);
+    }
+
+    // Dimensões - Profundidade
+    if (filters.profundidadeMin) {
+      const min = parseFloat(filters.profundidadeMin);
+      filtered = filtered.filter(item => item.profundidade_cm !== null && item.profundidade_cm >= min);
+    }
+    if (filters.profundidadeMax) {
+      const max = parseFloat(filters.profundidadeMax);
+      filtered = filtered.filter(item => item.profundidade_cm !== null && item.profundidade_cm <= max);
+    }
+
+    // Peso
+    if (filters.pesoMin) {
+      const min = parseFloat(filters.pesoMin);
+      filtered = filtered.filter(item => item.peso_kg !== null && item.peso_kg >= min);
+    }
+    if (filters.pesoMax) {
+      const max = parseFloat(filters.pesoMax);
+      filtered = filtered.filter(item => item.peso_kg !== null && item.peso_kg <= max);
+    }
+
     setFilteredItens(filtered);
+  };
+
+  const handleApplyAdvancedFilters = () => {
+    applyAllFilters(busca, advancedFilters);
+    toast.success(`${filteredItens.length} itens encontrados`);
+  };
+
+  const handleClearAdvancedFilters = () => {
+    setAdvancedFilters(initialFilters);
+    applyAllFilters(busca, initialFilters);
+    toast.info("Filtros limpos");
   };
 
   const handleScanResult = (code: string) => {
@@ -120,22 +238,23 @@ const ConsultarEstoque = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="sticky top-0 bg-background border-b p-4 z-10">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-4 mb-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/menu")}>
-              <ArrowLeft className="h-6 w-6" />
+      <div className="sticky top-0 bg-background border-b p-3 sm:p-4 z-10">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="touch-target">
+              <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
-            <h1 className="text-2xl font-bold">Consultar Estoque</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold flex-1">Consultar Estoque</h1>
+            <ThemeToggle />
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                 <Input
                   placeholder="Buscar por SKU, nome, ID ou categoria..."
-                  className="pl-10 h-12"
+                  className="pl-9 sm:pl-10 h-10 sm:h-12 text-sm sm:text-base"
                   value={busca}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
@@ -144,18 +263,28 @@ const ConsultarEstoque = () => {
                 type="button"
                 size="icon"
                 variant="outline"
-                className="h-12 w-12"
+                className="h-10 w-10 sm:h-12 sm:w-12 touch-target"
                 onClick={() => setShowScanner(true)}
               >
-                <ScanBarcode className="h-5 w-5" />
+                <ScanBarcode className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
 
+            <AdvancedFilters
+              filters={advancedFilters}
+              onFiltersChange={setAdvancedFilters}
+              onApply={handleApplyAdvancedFilters}
+              onClear={handleClearAdvancedFilters}
+              categorias={[...categorias]}
+              statusList={[...statusList]}
+              alocacoes={[...alocacoes]}
+            />
+
             <form onSubmit={handleChatSubmit} className="relative">
-              <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
               <Input
-                placeholder="Pergunte sobre seu estoque (ex: itens em EVENTO)"
-                className="pl-10 pr-12 h-12"
+                placeholder="Pergunte sobre seu estoque..."
+                className="pl-9 sm:pl-10 pr-10 sm:pr-12 h-10 sm:h-12 text-sm sm:text-base"
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
               />
@@ -163,60 +292,65 @@ const ConsultarEstoque = () => {
                 type="submit" 
                 size="icon" 
                 variant="ghost"
-                className="absolute right-1 top-1/2 -translate-y-1/2"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
                 disabled={chatLoading}
               >
-                <Send className="h-5 w-5" />
+                <Send className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </form>
           </div>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-3 sm:p-4">
+        <div className="mb-3 text-sm text-muted-foreground">
+          {filteredItens.length} {filteredItens.length === 1 ? "item encontrado" : "itens encontrados"}
+        </div>
+
         {loading ? (
-          <p className="text-center text-muted-foreground">Carregando...</p>
+          <p className="text-center text-muted-foreground py-8">Carregando...</p>
         ) : filteredItens.length === 0 ? (
-          <p className="text-center text-muted-foreground">Nenhum item encontrado</p>
+          <p className="text-center text-muted-foreground py-8">Nenhum item encontrado</p>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {filteredItens.map((item) => (
               <div 
                 key={item.id_item} 
-                className="bg-card border rounded-lg overflow-hidden cursor-pointer transition-all"
+                className="bg-card border rounded-lg overflow-hidden cursor-pointer transition-all hover:shadow-md"
                 onClick={() => setExpandedItem(expandedItem === item.id_item ? null : item.id_item)}
               >
-                {/* SKU, QR Code e Código de Barras - Primeira Linha */}
+                {/* SKU, QR Code e Código de Barras */}
                 {item.sku && (
-                  <div className="bg-muted/50 p-3 flex items-center justify-between gap-3 flex-wrap border-b">
+                  <div className="bg-muted/50 p-2 sm:p-3 flex items-center justify-between gap-2 flex-wrap border-b">
                     <div className="text-center">
                       <span className="text-xs text-muted-foreground">SKU</span>
-                      <div className="text-xl font-bold font-mono">{item.sku}</div>
+                      <div className="text-base sm:text-xl font-bold font-mono">{item.sku}</div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <QRCodeSVG value={item.sku} size={40} />
-                      <Barcode value={item.sku} height={30} width={1} fontSize={8} displayValue={false} />
+                    <div className="flex items-center gap-2 sm:gap-4">
+                      <QRCodeSVG value={item.sku} size={32} className="sm:w-10 sm:h-10" />
+                      <div className="hidden sm:block">
+                        <Barcode value={item.sku} height={25} width={1} fontSize={8} displayValue={false} />
+                      </div>
                     </div>
                   </div>
                 )}
 
-                <div className="p-4 flex gap-4">
+                <div className="p-3 sm:p-4 flex gap-3 sm:gap-4">
                   {/* Preview de Imagem */}
                   <div className="flex flex-col gap-2">
                     {item.imagem_item ? (
                       <img 
                         src={item.imagem_item} 
                         alt={item.nome_item}
-                        className="w-20 h-20 object-cover rounded"
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded"
                       />
                     ) : (
-                      <div className="w-20 h-20 bg-muted rounded flex items-center justify-center">
-                        <Search className="h-8 w-8 text-muted-foreground" />
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded flex items-center justify-center">
+                        <Search className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                       </div>
                     )}
-                    {/* Thumbnail de Vídeo */}
                     {item.video_item && (
-                      <div className="w-20 h-14 relative rounded overflow-hidden bg-muted">
+                      <div className="w-16 h-10 sm:w-20 sm:h-14 relative rounded overflow-hidden bg-muted">
                         <video
                           src={item.video_item}
                           className="w-full h-full object-cover"
@@ -224,40 +358,65 @@ const ConsultarEstoque = () => {
                           preload="metadata"
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                          <Play className="h-5 w-5 text-white" />
+                          <Play className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{item.nome_item}</h3>
-                    <p className="text-sm text-muted-foreground">{item.categoria_item}</p>
-                    <div className="flex gap-2 mt-2 text-sm flex-wrap">
-                      <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm sm:text-lg truncate">{item.nome_item}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{item.categoria_item}</p>
+                    <div className="flex gap-1 sm:gap-2 mt-1 sm:mt-2 text-xs flex-wrap">
+                      <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-primary/10 text-primary rounded">
                         {item.status_item}
                       </span>
-                      <span className="px-2 py-1 bg-blue-500/10 text-blue-600 rounded text-xs">
+                      <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-500/10 text-blue-600 rounded">
                         {item.alocacao}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Novo: {item.quantidade_novo} | Usado: {item.quantidade_usado} | Danificado: {item.quantidade_danificado}
+                    <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
+                      N: {item.quantidade_novo} | U: {item.quantidade_usado} | D: {item.quantidade_danificado}
                     </p>
                   </div>
                 </div>
 
                 {/* Detalhes Expandidos */}
-                {expandedItem === item.id_item && item.sku && (
-                  <div className="p-4 border-t bg-muted/30">
-                    <div className="flex items-center justify-center gap-6">
-                      <div className="text-center">
-                        <span className="text-xs text-muted-foreground block mb-1">QR Code Ampliado</span>
-                        <QRCodeSVG value={item.sku} size={80} />
+                {expandedItem === item.id_item && (
+                  <div className="p-3 sm:p-4 border-t bg-muted/30 space-y-3">
+                    {item.sku && (
+                      <div className="flex items-center justify-center gap-4 sm:gap-6">
+                        <div className="text-center">
+                          <span className="text-xs text-muted-foreground block mb-1">QR Code</span>
+                          <QRCodeSVG value={item.sku} size={60} className="sm:w-20 sm:h-20" />
+                        </div>
+                        <div className="text-center">
+                          <span className="text-xs text-muted-foreground block mb-1">Código de Barras</span>
+                          <Barcode value={item.sku} height={40} width={1.2} fontSize={10} />
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <span className="text-xs text-muted-foreground block mb-1">Código de Barras</span>
-                        <Barcode value={item.sku} height={50} width={1.5} fontSize={12} />
+                    )}
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                      {(item.comprimento_cm || item.largura_cm || item.profundidade_cm) && (
+                        <div>
+                          <span className="text-muted-foreground">Dimensões:</span>
+                          <div className="font-medium">
+                            {item.comprimento_cm || "-"} × {item.largura_cm || "-"} × {item.profundidade_cm || "-"} cm
+                          </div>
+                        </div>
+                      )}
+                      {item.peso_kg && (
+                        <div>
+                          <span className="text-muted-foreground">Peso:</span>
+                          <div className="font-medium">{item.peso_kg} kg</div>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-muted-foreground">Cadastro:</span>
+                        <div className="font-medium">
+                          {new Date(item.data_cadastro).toLocaleDateString("pt-BR")}
+                        </div>
                       </div>
                     </div>
                   </div>
