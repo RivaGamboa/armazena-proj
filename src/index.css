@@ -122,3 +122,89 @@
     @apply bg-gradient-to-br from-card via-card to-primary/5;
   }
 }
+
+/* Responsive container utilities */
+@layer components {
+  .container-responsive {
+    @apply w-full px-3 sm:px-4 md:px-6 lg:px-8 mx-auto;
+    max-width: 100%;
+  }
+  
+  @screen sm {
+    .container-responsive {
+      max-width: 640px;
+    }
+  }
+  
+  @screen md {
+    .container-responsive {
+      max-width: 768px;
+    }
+  }
+  
+  @screen lg {
+    .container-responsive {
+      max-width: 1024px;
+    }
+  }
+  
+  @screen xl {
+    .container-responsive {
+      max-width: 1280px;
+    }
+  }
+  
+  @screen 2xl {
+    .container-responsive {
+      max-width: 1536px;
+    }
+  }
+  
+  /* Touch-friendly button sizes for mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Responsive text utilities */
+  .text-responsive-xs {
+    @apply text-xs sm:text-sm;
+  }
+  
+  .text-responsive-sm {
+    @apply text-sm sm:text-base;
+  }
+  
+  .text-responsive-base {
+    @apply text-base sm:text-lg;
+  }
+  
+  .text-responsive-lg {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+  
+  .text-responsive-xl {
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+  
+  .text-responsive-2xl {
+    @apply text-2xl sm:text-3xl md:text-4xl;
+  }
+  
+  /* Card responsive padding */
+  .card-padding-responsive {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+  
+  /* Grid responsive utilities */
+  .grid-responsive-2 {
+    @apply grid grid-cols-1 sm:grid-cols-2;
+  }
+  
+  .grid-responsive-3 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  .grid-responsive-4 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+}
