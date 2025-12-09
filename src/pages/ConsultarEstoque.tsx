@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode, Play } from "lucide-react";
+import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode, Play, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { AdvancedFilters, AdvancedFiltersState, initialFilters } from "@/components/AdvancedFilters";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MovementTimeline } from "@/components/MovementTimeline";
 import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
 import { Constants } from "@/integrations/supabase/types";
@@ -383,7 +384,7 @@ const ConsultarEstoque = () => {
 
                 {/* Detalhes Expandidos */}
                 {expandedItem === item.id_item && (
-                  <div className="p-3 sm:p-4 border-t bg-muted/30 space-y-3">
+                  <div className="p-3 sm:p-4 border-t bg-muted/30 space-y-4">
                     {item.sku && (
                       <div className="flex items-center justify-center gap-4 sm:gap-6">
                         <div className="text-center">
@@ -418,6 +419,11 @@ const ConsultarEstoque = () => {
                           {new Date(item.data_cadastro).toLocaleDateString("pt-BR")}
                         </div>
                       </div>
+                    </div>
+
+                    {/* Timeline de Movimentações */}
+                    <div className="pt-3 border-t">
+                      <MovementTimeline itemId={item.id_item} />
                     </div>
                   </div>
                 )}
