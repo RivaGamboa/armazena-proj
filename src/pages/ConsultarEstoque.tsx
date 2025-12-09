@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode, Play, History } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode, Play, CheckSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { AdvancedFilters, AdvancedFiltersState, initialFilters } from "@/components/AdvancedFilters";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MovementTimeline } from "@/components/MovementTimeline";
+import { BatchActionsBar } from "@/components/BatchActionsBar";
 import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
 import { Constants } from "@/integrations/supabase/types";
@@ -44,6 +46,8 @@ const ConsultarEstoque = () => {
   const [showScanner, setShowScanner] = useState(false);
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFiltersState>(initialFilters);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const categorias = Constants.public.Enums.categoria_item_enum;
   const statusList = Constants.public.Enums.status_item_enum;
@@ -237,8 +241,32 @@ const ConsultarEstoque = () => {
     }
   };
 
+  const toggleItemSelection = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedIds(prev => 
+      prev.includes(id) 
+        ? prev.filter(i => i !== id) 
+        : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    setSelectedIds(filteredItens.map(item => item.id_item));
+  };
+
+  const handleClearSelection = () => {
+    setSelectedIds([]);
+    setSelectionMode(false);
+  };
+
+  const handleBatchActionComplete = () => {
+    setSelectedIds([]);
+    setSelectionMode(false);
+    loadItens();
+  };
+
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className={`min-h-screen bg-background ${selectedIds.length > 0 ? 'pb-40' : 'pb-20'}`}>
       <div className="sticky top-0 bg-background border-b p-3 sm:p-4 z-10">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
@@ -246,6 +274,18 @@ const ConsultarEstoque = () => {
               <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold flex-1">Consultar Estoque</h1>
+            <Button
+              variant={selectionMode ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setSelectionMode(!selectionMode);
+                if (selectionMode) setSelectedIds([]);
+              }}
+              className="gap-1.5"
+            >
+              <CheckSquare className="h-4 w-4" />
+              <span className="hidden sm:inline">Selecionar</span>
+            </Button>
             <ThemeToggle />
           </div>
 
@@ -314,18 +354,39 @@ const ConsultarEstoque = () => {
           <p className="text-center text-muted-foreground py-8">Nenhum item encontrado</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-            {filteredItens.map((item) => (
+            {filteredItens.map((item) => {
+              const isSelected = selectedIds.includes(item.id_item);
+              return (
               <div 
                 key={item.id_item} 
-                className="bg-card border rounded-lg overflow-hidden cursor-pointer transition-all hover:shadow-md"
-                onClick={() => setExpandedItem(expandedItem === item.id_item ? null : item.id_item)}
+                className={`bg-card border rounded-lg overflow-hidden cursor-pointer transition-all hover:shadow-md ${isSelected ? 'ring-2 ring-primary border-primary' : ''}`}
+                onClick={() => {
+                  if (selectionMode) {
+                    setSelectedIds(prev => 
+                      prev.includes(item.id_item) 
+                        ? prev.filter(i => i !== item.id_item) 
+                        : [...prev, item.id_item]
+                    );
+                  } else {
+                    setExpandedItem(expandedItem === item.id_item ? null : item.id_item);
+                  }
+                }}
               >
                 {/* SKU, QR Code e Código de Barras */}
                 {item.sku && (
                   <div className="bg-muted/50 p-2 sm:p-3 flex items-center justify-between gap-2 flex-wrap border-b">
-                    <div className="text-center">
-                      <span className="text-xs text-muted-foreground">SKU</span>
-                      <div className="text-base sm:text-xl font-bold font-mono">{item.sku}</div>
+                    <div className="flex items-center gap-2">
+                      {selectionMode && (
+                        <Checkbox 
+                          checked={isSelected}
+                          onClick={(e) => toggleItemSelection(item.id_item, e)}
+                          className="h-5 w-5"
+                        />
+                      )}
+                      <div className="text-center">
+                        <span className="text-xs text-muted-foreground">SKU</span>
+                        <div className="text-base sm:text-xl font-bold font-mono">{item.sku}</div>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 sm:gap-4">
                       <QRCodeSVG value={item.sku} size={32} className="sm:w-10 sm:h-10" />
@@ -337,6 +398,14 @@ const ConsultarEstoque = () => {
                 )}
 
                 <div className="p-3 sm:p-4 flex gap-3 sm:gap-4">
+                  {/* Checkbox para seleção (quando não tem SKU) */}
+                  {selectionMode && !item.sku && (
+                    <Checkbox 
+                      checked={isSelected}
+                      onClick={(e) => toggleItemSelection(item.id_item, e)}
+                      className="h-5 w-5 mt-1"
+                    />
+                  )}
                   {/* Preview de Imagem */}
                   <div className="flex flex-col gap-2">
                     {item.imagem_item ? (
@@ -428,10 +497,19 @@ const ConsultarEstoque = () => {
                   </div>
                 )}
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>
+
+      {/* Batch Actions Bar */}
+      <BatchActionsBar
+        selectedIds={selectedIds}
+        totalItems={filteredItens.length}
+        onSelectAll={handleSelectAll}
+        onClearSelection={handleClearSelection}
+        onActionComplete={handleBatchActionComplete}
+      />
 
       <BarcodeScanner
         isOpen={showScanner}
