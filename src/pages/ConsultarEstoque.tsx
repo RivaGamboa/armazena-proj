@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode, Play, CheckSquare } from "lucide-react";
+import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode, Play, CheckSquare, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
@@ -490,10 +490,23 @@ const ConsultarEstoque = () => {
                       </div>
                     </div>
 
-                    {/* Timeline de Movimentações */}
+                    {/* Timeline de Movimentações - Preview */}
                     <div className="pt-3 border-t">
                       <MovementTimeline itemId={item.id_item} />
                     </div>
+
+                    {/* Ver Detalhes Completos */}
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 mt-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/item/${item.id_item}`);
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Ver Detalhes Completos
+                    </Button>
                   </div>
                 )}
               </div>

@@ -13,6 +13,7 @@ import ConsultarEstoque from "./pages/ConsultarEstoque";
 import RetirarItem from "./pages/RetirarItem";
 import DevolverItem from "./pages/DevolverItem";
 import Dashboard from "./pages/Dashboard";
+import ItemDetails from "./pages/ItemDetails";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/cadastrar" element={<CadastrarItem />} />
             <Route path="/consultar" element={<ConsultarEstoque />} />
+            <Route path="/item/:id" element={<ItemDetails />} />
             <Route path="/retirar" element={<RetirarItem />} />
             <Route path="/devolver" element={<DevolverItem />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
