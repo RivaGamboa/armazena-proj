@@ -68,6 +68,39 @@ export type Database = {
         }
         Relationships: []
       }
+      categorias_restaurante: {
+        Row: {
+          cor: string | null
+          created_at: string
+          criado_por: string
+          descricao: string | null
+          icone: string | null
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          cor?: string | null
+          created_at?: string
+          criado_por: string
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          cor?: string | null
+          created_at?: string
+          criado_por?: string
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       historico_movimentacoes: {
         Row: {
           alocacao_anterior: Database["public"]["Enums"]["alocacao_enum"] | null
@@ -209,6 +242,109 @@ export type Database = {
         }
         Relationships: []
       }
+      itens_restaurante: {
+        Row: {
+          categoria_id: string | null
+          codigo_barras: string | null
+          created_at: string
+          criado_por: string
+          custo: number | null
+          data_aquisicao: string | null
+          descricao: string | null
+          fornecedor: string | null
+          foto_url: string | null
+          id: string
+          localizacao: Database["public"]["Enums"]["localizacao_enum"]
+          nome: string
+          quantidade: number
+          quantidade_minima: number
+          status: Database["public"]["Enums"]["item_status"]
+          updated_at: string
+        }
+        Insert: {
+          categoria_id?: string | null
+          codigo_barras?: string | null
+          created_at?: string
+          criado_por: string
+          custo?: number | null
+          data_aquisicao?: string | null
+          descricao?: string | null
+          fornecedor?: string | null
+          foto_url?: string | null
+          id?: string
+          localizacao?: Database["public"]["Enums"]["localizacao_enum"]
+          nome: string
+          quantidade?: number
+          quantidade_minima?: number
+          status?: Database["public"]["Enums"]["item_status"]
+          updated_at?: string
+        }
+        Update: {
+          categoria_id?: string | null
+          codigo_barras?: string | null
+          created_at?: string
+          criado_por?: string
+          custo?: number | null
+          data_aquisicao?: string | null
+          descricao?: string | null
+          fornecedor?: string | null
+          foto_url?: string | null
+          id?: string
+          localizacao?: Database["public"]["Enums"]["localizacao_enum"]
+          nome?: string
+          quantidade?: number
+          quantidade_minima?: number
+          status?: Database["public"]["Enums"]["item_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_restaurante_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_restaurante"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      movimentacoes_restaurante: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          observacao: string | null
+          quantidade: number
+          tipo: Database["public"]["Enums"]["movimento_tipo"]
+          usuario_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          observacao?: string | null
+          quantidade: number
+          tipo: Database["public"]["Enums"]["movimento_tipo"]
+          usuario_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          observacao?: string | null
+          quantidade?: number
+          tipo?: Database["public"]["Enums"]["movimento_tipo"]
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movimentacoes_restaurante_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "itens_restaurante"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -341,6 +477,15 @@ export type Database = {
         | "Materiais"
         | "Equipamentos"
         | "Consumíveis"
+      item_status: "ativo" | "manutencao" | "descartado"
+      localizacao_enum:
+        | "Cozinha"
+        | "Salao"
+        | "Bar"
+        | "Deposito"
+        | "Area Externa"
+        | "Escritorio"
+      movimento_tipo: "entrada" | "saida" | "transferencia" | "perda" | "ajuste"
       status_item_enum: "NOVO" | "USADO" | "DANIFICADO" | "EM_MANUTENCAO"
     }
     CompositeTypes: {
@@ -477,6 +622,16 @@ export const Constants = {
         "Equipamentos",
         "Consumíveis",
       ],
+      item_status: ["ativo", "manutencao", "descartado"],
+      localizacao_enum: [
+        "Cozinha",
+        "Salao",
+        "Bar",
+        "Deposito",
+        "Area Externa",
+        "Escritorio",
+      ],
+      movimento_tipo: ["entrada", "saida", "transferencia", "perda", "ajuste"],
       status_item_enum: ["NOVO", "USADO", "DANIFICADO", "EM_MANUTENCAO"],
     },
   },
