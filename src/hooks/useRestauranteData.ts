@@ -128,13 +128,13 @@ export const useRestauranteData = () => {
   }, [loadAll]);
 
   // CRUD Operations
-  const createCategoria = async (data: Partial<CategoriaRestaurante>) => {
+  const createCategoria = async (data: { nome: string; descricao?: string; cor?: string }) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Usuário não autenticado');
 
     const { error } = await supabase
       .from('categorias_restaurante')
-      .insert([{ ...data, criado_por: user.id }]);
+      .insert([{ nome: data.nome, descricao: data.descricao, cor: data.cor, criado_por: user.id }]);
     
     if (error) throw error;
     await loadCategorias();
