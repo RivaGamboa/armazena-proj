@@ -165,13 +165,40 @@ export const useRestauranteData = () => {
     toast.success('Categoria removida!');
   };
 
-  const createItem = async (data: Partial<ItemRestaurante>) => {
+  const createItem = async (data: { 
+    nome: string; 
+    descricao?: string;
+    categoria_id?: string;
+    quantidade?: number;
+    quantidade_minima?: number;
+    localizacao?: Localizacao;
+    fornecedor?: string;
+    custo?: number;
+    data_aquisicao?: string;
+    codigo_barras?: string;
+    foto_url?: string;
+    status?: ItemStatus;
+  }) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Usuário não autenticado');
 
     const { error } = await supabase
       .from('itens_restaurante')
-      .insert([{ ...data, criado_por: user.id }]);
+      .insert([{ 
+        nome: data.nome,
+        descricao: data.descricao,
+        categoria_id: data.categoria_id,
+        quantidade: data.quantidade ?? 0,
+        quantidade_minima: data.quantidade_minima ?? 5,
+        localizacao: data.localizacao ?? 'Deposito',
+        fornecedor: data.fornecedor,
+        custo: data.custo,
+        data_aquisicao: data.data_aquisicao,
+        codigo_barras: data.codigo_barras,
+        foto_url: data.foto_url,
+        status: data.status ?? 'ativo',
+        criado_por: user.id 
+      }]);
     
     if (error) throw error;
     await loadItens();
