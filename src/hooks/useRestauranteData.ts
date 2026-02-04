@@ -59,7 +59,7 @@ export const useRestauranteData = () => {
       .from('movimentacoes_restaurante')
       .select(`
         *,
-        item:itens_restaurante(nome, categoria_id)
+        item:itens_restaurante(id, nome, categoria_id)
       `)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -68,7 +68,12 @@ export const useRestauranteData = () => {
       console.error('Error loading movements:', error);
       return;
     }
-    setMovimentacoes(data || []);
+    // Map data to match our type structure
+    const mapped = (data || []).map(mov => ({
+      ...mov,
+      item: mov.item ? { ...mov.item } as any : undefined
+    })) as MovimentacaoRestaurante[];
+    setMovimentacoes(mapped);
   }, []);
 
   const calculateStats = useCallback(async () => {
