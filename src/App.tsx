@@ -14,6 +14,7 @@ import RetirarItem from "./pages/RetirarItem";
 import DevolverItem from "./pages/DevolverItem";
 import Dashboard from "./pages/Dashboard";
 import ItemDetails from "./pages/ItemDetails";
+import RestauranteApp from "./pages/RestauranteApp";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,8 @@ const App = () => (
             <Route path="/item/:id" element={<ItemDetails />} />
             <Route path="/retirar" element={<RetirarItem />} />
             <Route path="/devolver" element={<DevolverItem />} />
+            {/* RestauraStock - New Restaurant Inventory System */}
+            <Route path="/restaurante" element={<RestauranteApp />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
