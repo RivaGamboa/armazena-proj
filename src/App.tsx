@@ -37,6 +37,7 @@ const App = () => (
             <Route path="/devolver" element={<DevolverItem />} />
             {/* RestauraStock - New Restaurant Inventory System */}
             <Route path="/restaurante" element={<RestauranteApp />} />
+            <Route path="/restaurante/*" element={<RestauranteApp />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
