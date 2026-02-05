@@ -41,7 +41,8 @@ const RestauranteApp = () => {
     updateItem,
     deleteItem,
     createMovimentacao,
-    uploadItemPhoto
+    uploadItemPhoto,
+    uploadMultiplePhotos
   } = useRestauranteData();
 
   const [searchTerm, setSearchTerm] = useState("");
