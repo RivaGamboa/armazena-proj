@@ -83,15 +83,25 @@ const RestauranteApp = () => {
     setShowMovementForm(true);
   };
 
-  const handleSubmitItem = async (data: any, photo?: File) => {
+  const handleSubmitItem = async (data: any, photos?: File[]) => {
     try {
-      let foto_url = data.foto_url;
+      let galeria_fotos = data.galeria_fotos || [];
       
-      if (photo) {
-        foto_url = await uploadItemPhoto(photo, data.nome);
+      if (photos && photos.length > 0) {
+        const uploadedUrls = await uploadMultiplePhotos(photos, data.nome);
+        galeria_fotos = [...galeria_fotos, ...uploadedUrls];
       }
       
-      const itemData = { ...data, foto_url };
+      // Update featured photo URL based on the new gallery
+      const fotoDestaqueIndex = data.foto_destaque_index ?? 0;
+      const foto_url = galeria_fotos[fotoDestaqueIndex] || galeria_fotos[0] || null;
+      
+      const itemData = { 
+        ...data, 
+        galeria_fotos,
+        foto_url,
+        foto_destaque_index: fotoDestaqueIndex
+      };
       
       if (editingItem) {
         await updateItem(editingItem.id, itemData);
