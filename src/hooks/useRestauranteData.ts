@@ -178,6 +178,11 @@ export const useRestauranteData = () => {
     codigo_barras?: string;
     foto_url?: string;
     status?: ItemStatus;
+    largura_cm?: number | null;
+    altura_cm?: number | null;
+    profundidade_cm?: number | null;
+    galeria_fotos?: string[];
+    foto_destaque_index?: number;
   }) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Usuário não autenticado');
@@ -197,6 +202,11 @@ export const useRestauranteData = () => {
         codigo_barras: data.codigo_barras,
         foto_url: data.foto_url,
         status: data.status ?? 'ativo',
+        largura_cm: data.largura_cm,
+        altura_cm: data.altura_cm,
+        profundidade_cm: data.profundidade_cm,
+        galeria_fotos: data.galeria_fotos ?? [],
+        foto_destaque_index: data.foto_destaque_index ?? 0,
         criado_por: user.id 
       }]);
     
@@ -250,9 +260,9 @@ export const useRestauranteData = () => {
     toast.success('Movimentação registrada!');
   };
 
-  const uploadItemPhoto = async (file: File, itemName: string): Promise<string> => {
+  const uploadItemPhoto = async (file: File, itemName: string, index?: number): Promise<string> => {
     const fileExt = file.name.split('.').pop();
-    const fileName = `${itemName.replace(/\s+/g, '-')}-${Date.now()}.${fileExt}`;
+    const fileName = `${itemName.replace(/\s+/g, '-')}-${Date.now()}-${index ?? 0}.${fileExt}`;
     
     const { error: uploadError } = await supabase.storage
       .from('item-photos')
@@ -265,6 +275,11 @@ export const useRestauranteData = () => {
       .getPublicUrl(fileName);
     
     return publicUrl;
+  };
+
+  const uploadMultiplePhotos = async (files: File[], itemName: string): Promise<string[]> => {
+    const uploadPromises = files.map((file, index) => uploadItemPhoto(file, itemName, index));
+    return Promise.all(uploadPromises);
   };
 
   return {
@@ -281,6 +296,7 @@ export const useRestauranteData = () => {
     updateItem,
     deleteItem,
     createMovimentacao,
-    uploadItemPhoto
+    uploadItemPhoto,
+    uploadMultiplePhotos
   };
 };

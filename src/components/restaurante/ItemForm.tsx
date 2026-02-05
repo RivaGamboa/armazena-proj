@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Camera } from "lucide-react";
 import { ItemRestaurante, CategoriaRestaurante, Localizacao, ItemStatus } from "@/types/restaurante";
+import { ImageGalleryUpload } from "./ImageGalleryUpload";
 
 interface ItemFormProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: Partial<ItemRestaurante>, photo?: File) => Promise<void>;
+  onSubmit: (data: Partial<ItemRestaurante>, photos?: File[]) => Promise<void>;
   item?: ItemRestaurante | null;
   categorias: CategoriaRestaurante[];
 }
@@ -25,8 +25,9 @@ const statusOptions: { value: ItemStatus; label: string }[] = [
 
 export const ItemForm = ({ open, onClose, onSubmit, item, categorias }: ItemFormProps) => {
   const [loading, setLoading] = useState(false);
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [featuredIndex, setFeaturedIndex] = useState(0);
   const [formData, setFormData] = useState({
     nome: '',
     descricao: '',
@@ -38,7 +39,10 @@ export const ItemForm = ({ open, onClose, onSubmit, item, categorias }: ItemForm
     custo: 0,
     data_aquisicao: new Date().toISOString().split('T')[0],
     codigo_barras: '',
-    status: 'ativo' as ItemStatus
+    status: 'ativo' as ItemStatus,
+    largura_cm: '' as string | number,
+    altura_cm: '' as string | number,
+    profundidade_cm: '' as string | number
   });
 
   useEffect(() => {
@@ -54,9 +58,13 @@ export const ItemForm = ({ open, onClose, onSubmit, item, categorias }: ItemForm
         custo: item.custo || 0,
         data_aquisicao: item.data_aquisicao || new Date().toISOString().split('T')[0],
         codigo_barras: item.codigo_barras || '',
-        status: item.status
+        status: item.status,
+        largura_cm: item.largura_cm ?? '',
+        altura_cm: item.altura_cm ?? '',
+        profundidade_cm: item.profundidade_cm ?? ''
       });
-      setPhotoPreview(item.foto_url);
+      setGalleryImages(item.galeria_fotos || (item.foto_url ? [item.foto_url] : []));
+      setFeaturedIndex(item.foto_destaque_index || 0);
     } else {
       setFormData({
         nome: '',
@@ -69,27 +77,37 @@ export const ItemForm = ({ open, onClose, onSubmit, item, categorias }: ItemForm
         custo: 0,
         data_aquisicao: new Date().toISOString().split('T')[0],
         codigo_barras: '',
-        status: 'ativo'
+        status: 'ativo',
+        largura_cm: '',
+        altura_cm: '',
+        profundidade_cm: ''
       });
-      setPhotoPreview(null);
+      setGalleryImages([]);
+      setFeaturedIndex(0);
     }
-    setPhoto(null);
+    setPendingFiles([]);
   }, [item, open]);
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPhoto(file);
-      setPhotoPreview(URL.createObjectURL(file));
-    }
-  };
+  const handleGalleryChange = useCallback((images: string[], newFeaturedIndex: number) => {
+    setGalleryImages(images);
+    setFeaturedIndex(newFeaturedIndex);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      await onSubmit(formData, photo || undefined);
+      const submitData = {
+        ...formData,
+        largura_cm: formData.largura_cm === '' ? null : Number(formData.largura_cm),
+        altura_cm: formData.altura_cm === '' ? null : Number(formData.altura_cm),
+        profundidade_cm: formData.profundidade_cm === '' ? null : Number(formData.profundidade_cm),
+        galeria_fotos: galleryImages,
+        foto_destaque_index: featuredIndex,
+        foto_url: galleryImages[featuredIndex] || null
+      };
+      await onSubmit(submitData, pendingFiles.length > 0 ? pendingFiles : undefined);
       onClose();
     } catch (error) {
       console.error('Error saving item:', error);
@@ -106,29 +124,14 @@ export const ItemForm = ({ open, onClose, onSubmit, item, categorias }: ItemForm
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Photo Upload */}
-          <div className="flex justify-center">
-            <label className="cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="hidden"
-              />
-              {photoPreview ? (
-                <img 
-                  src={photoPreview} 
-                  alt="Preview" 
-                  className="w-32 h-32 object-cover rounded-lg border-2 border-dashed border-muted-foreground hover:border-primary transition-colors"
-                />
-              ) : (
-                <div className="w-32 h-32 rounded-lg border-2 border-dashed border-muted-foreground hover:border-primary transition-colors flex flex-col items-center justify-center">
-                  <Camera className="h-8 w-8 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground mt-1">Adicionar foto</span>
-                </div>
-              )}
-            </label>
-          </div>
+          {/* Image Gallery Upload */}
+          <ImageGalleryUpload
+            images={galleryImages}
+            featuredIndex={featuredIndex}
+            onImagesChange={handleGalleryChange}
+            pendingFiles={pendingFiles}
+            onPendingFilesChange={setPendingFiles}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
@@ -199,6 +202,49 @@ export const ItemForm = ({ open, onClose, onSubmit, item, categorias }: ItemForm
                 value={formData.quantidade_minima}
                 onChange={(e) => setFormData({ ...formData, quantidade_minima: parseInt(e.target.value) || 0 })}
               />
+            </div>
+
+            {/* Dimensões em centímetros */}
+            <div className="md:col-span-2">
+              <Label className="text-sm font-medium mb-2 block">Dimensões (cm)</Label>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label htmlFor="largura_cm" className="text-xs text-muted-foreground">Largura</Label>
+                  <Input
+                    id="largura_cm"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="cm"
+                    value={formData.largura_cm}
+                    onChange={(e) => setFormData({ ...formData, largura_cm: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="altura_cm" className="text-xs text-muted-foreground">Altura</Label>
+                  <Input
+                    id="altura_cm"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="cm"
+                    value={formData.altura_cm}
+                    onChange={(e) => setFormData({ ...formData, altura_cm: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="profundidade_cm" className="text-xs text-muted-foreground">Profundidade</Label>
+                  <Input
+                    id="profundidade_cm"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="cm"
+                    value={formData.profundidade_cm}
+                    onChange={(e) => setFormData({ ...formData, profundidade_cm: e.target.value })}
+                  />
+                </div>
+              </div>
             </div>
 
             <div>

@@ -244,6 +244,7 @@ export type Database = {
       }
       itens_restaurante: {
         Row: {
+          altura_cm: number | null
           categoria_id: string | null
           codigo_barras: string | null
           created_at: string
@@ -252,16 +253,21 @@ export type Database = {
           data_aquisicao: string | null
           descricao: string | null
           fornecedor: string | null
+          foto_destaque_index: number | null
           foto_url: string | null
+          galeria_fotos: string[] | null
           id: string
+          largura_cm: number | null
           localizacao: Database["public"]["Enums"]["localizacao_enum"]
           nome: string
+          profundidade_cm: number | null
           quantidade: number
           quantidade_minima: number
           status: Database["public"]["Enums"]["item_status"]
           updated_at: string
         }
         Insert: {
+          altura_cm?: number | null
           categoria_id?: string | null
           codigo_barras?: string | null
           created_at?: string
@@ -270,16 +276,21 @@ export type Database = {
           data_aquisicao?: string | null
           descricao?: string | null
           fornecedor?: string | null
+          foto_destaque_index?: number | null
           foto_url?: string | null
+          galeria_fotos?: string[] | null
           id?: string
+          largura_cm?: number | null
           localizacao?: Database["public"]["Enums"]["localizacao_enum"]
           nome: string
+          profundidade_cm?: number | null
           quantidade?: number
           quantidade_minima?: number
           status?: Database["public"]["Enums"]["item_status"]
           updated_at?: string
         }
         Update: {
+          altura_cm?: number | null
           categoria_id?: string | null
           codigo_barras?: string | null
           created_at?: string
@@ -288,10 +299,14 @@ export type Database = {
           data_aquisicao?: string | null
           descricao?: string | null
           fornecedor?: string | null
+          foto_destaque_index?: number | null
           foto_url?: string | null
+          galeria_fotos?: string[] | null
           id?: string
+          largura_cm?: number | null
           localizacao?: Database["public"]["Enums"]["localizacao_enum"]
           nome?: string
+          profundidade_cm?: number | null
           quantidade?: number
           quantidade_minima?: number
           status?: Database["public"]["Enums"]["item_status"]
