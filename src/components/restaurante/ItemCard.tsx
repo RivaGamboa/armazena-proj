@@ -1,7 +1,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Package, MapPin, AlertTriangle, Edit, Trash2, ArrowUpDown } from "lucide-react";
+import { Package, MapPin, AlertTriangle, Edit, Trash2, ArrowUpDown, Ruler } from "lucide-react";
 import { ItemRestaurante } from "@/types/restaurante";
 
 interface ItemCardProps {
@@ -24,6 +24,16 @@ export const ItemCard = ({ item, onEdit, onDelete, onMovement }: ItemCardProps) 
     ativo: 'Ativo',
     manutencao: 'Manutenção',
     descartado: 'Descartado'
+  };
+
+  const hasDimensions = item.largura_cm || item.altura_cm || item.profundidade_cm;
+  
+  const formatDimensions = () => {
+    const parts = [];
+    if (item.largura_cm) parts.push(`${item.largura_cm}`);
+    if (item.altura_cm) parts.push(`${item.altura_cm}`);
+    if (item.profundidade_cm) parts.push(`${item.profundidade_cm}`);
+    return parts.join(' × ') + ' cm';
   };
 
   return (
@@ -72,6 +82,13 @@ export const ItemCard = ({ item, onEdit, onDelete, onMovement }: ItemCardProps) 
               <p className="text-sm text-green-600 font-medium mt-1">
                 R$ {Number(item.custo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
+            )}
+
+            {hasDimensions && (
+              <div className="flex items-center gap-1 mt-1 text-muted-foreground">
+                <Ruler className="h-3 w-3" />
+                <span className="text-xs">{formatDimensions()}</span>
+              </div>
             )}
           </div>
         </div>
