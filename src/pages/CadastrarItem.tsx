@@ -314,8 +314,15 @@ const CadastrarItem = () => {
 
     } catch (error) {
       console.error(error);
-      const errMsg = error instanceof Error ? error.message : String(error);
       console.error("Erro detalhado ao salvar:", error);
+      let errMsg = "Erro desconhecido";
+      if (error instanceof Error) {
+        errMsg = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        errMsg = (error as any).message || (error as any).details || JSON.stringify(error);
+      } else {
+        errMsg = String(error);
+      }
       toast.error(`Erro ao salvar item: ${errMsg}`);
     } finally {
       setLoading(false);
