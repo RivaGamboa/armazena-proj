@@ -103,23 +103,27 @@ export const SavedItemPreview = ({ item, onEdit, onAddNew }: SavedItemPreviewPro
 
         {/* Preview de Mídia */}
         {(item.imagem_item || item.video_item) && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             {item.imagem_item && (
               <div className="rounded-lg overflow-hidden border">
-                <img
-                  src={item.imagem_item}
-                  alt={item.nome_item}
-                  className="w-full h-32 object-cover"
-                />
+                <div className="relative w-full" style={{ aspectRatio: '1 / 1' }}>
+                  <img
+                    src={item.imagem_item}
+                    alt={item.nome_item}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
               </div>
             )}
             {item.video_item && (
-              <div className="rounded-lg overflow-hidden border bg-muted flex items-center justify-center h-32">
-                <video
-                  src={item.video_item}
-                  className="w-full h-full object-cover"
-                  controls
-                />
+              <div className="rounded-lg overflow-hidden border bg-muted">
+                <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
+                  <video
+                    src={item.video_item}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    controls
+                  />
+                </div>
               </div>
             )}
           </div>
