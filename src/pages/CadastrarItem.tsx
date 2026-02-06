@@ -314,7 +314,9 @@ const CadastrarItem = () => {
 
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao salvar item");
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error("Erro detalhado ao salvar:", error);
+      toast.error(`Erro ao salvar item: ${errMsg}`);
     } finally {
       setLoading(false);
     }
