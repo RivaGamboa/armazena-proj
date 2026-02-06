@@ -228,13 +228,13 @@ const CadastrarItem = () => {
       if (imagemFile) {
         const imagemPath = `${user.id}/${Date.now()}_${imagemFile.name}`;
         const { error: imagemError } = await supabase.storage
-          .from('estoque-media')
+          .from('item-photos')
           .upload(imagemPath, imagemFile);
         
         if (imagemError) throw imagemError;
         
         const { data: { publicUrl } } = supabase.storage
-          .from('estoque-media')
+          .from('item-photos')
           .getPublicUrl(imagemPath);
         
         imagemUrl = publicUrl;
@@ -243,13 +243,13 @@ const CadastrarItem = () => {
       if (videoFile) {
         const videoPath = `${user.id}/${Date.now()}_${videoFile.name}`;
         const { error: videoError } = await supabase.storage
-          .from('estoque-media')
+          .from('item-photos')
           .upload(videoPath, videoFile);
         
         if (videoError) throw videoError;
         
         const { data: { publicUrl } } = supabase.storage
-          .from('estoque-media')
+          .from('item-photos')
           .getPublicUrl(videoPath);
         
         videoUrl = publicUrl;
