@@ -103,51 +103,41 @@ export type Database = {
       }
       historico_movimentacoes: {
         Row: {
-          alocacao_anterior: Database["public"]["Enums"]["alocacao_enum"] | null
-          alocacao_nova: Database["public"]["Enums"]["alocacao_enum"] | null
+          alocacao_anterior: string | null
+          alocacao_nova: string | null
           data_operacao: string
           id: number
           id_item: number | null
           observacoes: string | null
           quantidade_alterada: number | null
-          status_anterior:
-            | Database["public"]["Enums"]["status_item_enum"]
-            | null
-          status_novo: Database["public"]["Enums"]["status_item_enum"] | null
+          status_anterior: string | null
+          status_novo: string | null
           tipo_operacao: string
           user_id: string
         }
         Insert: {
-          alocacao_anterior?:
-            | Database["public"]["Enums"]["alocacao_enum"]
-            | null
-          alocacao_nova?: Database["public"]["Enums"]["alocacao_enum"] | null
+          alocacao_anterior?: string | null
+          alocacao_nova?: string | null
           data_operacao?: string
           id?: number
           id_item?: number | null
           observacoes?: string | null
           quantidade_alterada?: number | null
-          status_anterior?:
-            | Database["public"]["Enums"]["status_item_enum"]
-            | null
-          status_novo?: Database["public"]["Enums"]["status_item_enum"] | null
+          status_anterior?: string | null
+          status_novo?: string | null
           tipo_operacao: string
           user_id: string
         }
         Update: {
-          alocacao_anterior?:
-            | Database["public"]["Enums"]["alocacao_enum"]
-            | null
-          alocacao_nova?: Database["public"]["Enums"]["alocacao_enum"] | null
+          alocacao_anterior?: string | null
+          alocacao_nova?: string | null
           data_operacao?: string
           id?: number
           id_item?: number | null
           observacoes?: string | null
           quantidade_alterada?: number | null
-          status_anterior?:
-            | Database["public"]["Enums"]["status_item_enum"]
-            | null
-          status_novo?: Database["public"]["Enums"]["status_item_enum"] | null
+          status_anterior?: string | null
+          status_novo?: string | null
           tipo_operacao?: string
           user_id?: string
         }
@@ -163,8 +153,8 @@ export type Database = {
       }
       itens_em_estoque: {
         Row: {
-          alocacao: Database["public"]["Enums"]["alocacao_enum"]
-          categoria_item: Database["public"]["Enums"]["categoria_item_enum"]
+          alocacao: string
+          categoria_item: string
           comprimento_cm: number | null
           data_cadastro: string
           descricao_item: string | null
@@ -182,15 +172,15 @@ export type Database = {
           quantidade_total: number | null
           quantidade_usado: number
           sku: string | null
-          status_item: Database["public"]["Enums"]["status_item_enum"]
+          status_item: string
           sync_status: string | null
           ultima_atualizacao: string
           user_id: string
           video_item: string | null
         }
         Insert: {
-          alocacao?: Database["public"]["Enums"]["alocacao_enum"]
-          categoria_item: Database["public"]["Enums"]["categoria_item_enum"]
+          alocacao?: string
+          categoria_item: string
           comprimento_cm?: number | null
           data_cadastro?: string
           descricao_item?: string | null
@@ -208,15 +198,15 @@ export type Database = {
           quantidade_total?: number | null
           quantidade_usado?: number
           sku?: string | null
-          status_item?: Database["public"]["Enums"]["status_item_enum"]
+          status_item?: string
           sync_status?: string | null
           ultima_atualizacao?: string
           user_id: string
           video_item?: string | null
         }
         Update: {
-          alocacao?: Database["public"]["Enums"]["alocacao_enum"]
-          categoria_item?: Database["public"]["Enums"]["categoria_item_enum"]
+          alocacao?: string
+          categoria_item?: string
           comprimento_cm?: number | null
           data_cadastro?: string
           descricao_item?: string | null
@@ -234,7 +224,7 @@ export type Database = {
           quantidade_total?: number | null
           quantidade_usado?: number
           sku?: string | null
-          status_item?: Database["public"]["Enums"]["status_item_enum"]
+          status_item?: string
           sync_status?: string | null
           ultima_atualizacao?: string
           user_id?: string
