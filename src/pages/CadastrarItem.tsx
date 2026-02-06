@@ -523,9 +523,9 @@ const CadastrarItem = () => {
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="comprimento">Comprimento (cm)</Label>
+              <Label htmlFor="altura">Altura (cm)</Label>
               <Input
-                id="comprimento"
+                id="altura"
                 type="number"
                 step="0.01"
                 value={formData.comprimento_cm}
