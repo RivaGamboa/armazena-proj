@@ -228,13 +228,13 @@ const CadastrarItem = () => {
       if (imagemFile) {
         const imagemPath = `${user.id}/${Date.now()}_${imagemFile.name}`;
         const { error: imagemError } = await supabase.storage
-          .from('estoque-media')
+          .from('item-photos')
           .upload(imagemPath, imagemFile);
         
         if (imagemError) throw imagemError;
         
         const { data: { publicUrl } } = supabase.storage
-          .from('estoque-media')
+          .from('item-photos')
           .getPublicUrl(imagemPath);
         
         imagemUrl = publicUrl;
@@ -243,13 +243,13 @@ const CadastrarItem = () => {
       if (videoFile) {
         const videoPath = `${user.id}/${Date.now()}_${videoFile.name}`;
         const { error: videoError } = await supabase.storage
-          .from('estoque-media')
+          .from('item-photos')
           .upload(videoPath, videoFile);
         
         if (videoError) throw videoError;
         
         const { data: { publicUrl } } = supabase.storage
-          .from('estoque-media')
+          .from('item-photos')
           .getPublicUrl(videoPath);
         
         videoUrl = publicUrl;
@@ -314,7 +314,9 @@ const CadastrarItem = () => {
 
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao salvar item");
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error("Erro detalhado ao salvar:", error);
+      toast.error(`Erro ao salvar item: ${errMsg}`);
     } finally {
       setLoading(false);
     }
@@ -523,9 +525,9 @@ const CadastrarItem = () => {
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="comprimento">Comprimento (cm)</Label>
+              <Label htmlFor="altura">Altura (cm)</Label>
               <Input
-                id="comprimento"
+                id="altura"
                 type="number"
                 step="0.01"
                 value={formData.comprimento_cm}
