@@ -185,7 +185,9 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
                     <div className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-600">
-                      {stats.porAlocacao.find(a => a.name === 'DEPOSITO')?.value || 0}
+                      {stats.porAlocacao
+                        .filter(a => a.name !== 'EVENTO' && a.name !== 'FUNCIONARIO')
+                        .reduce((sum: number, a: any) => sum + (a.value as number), 0)}
                     </div>
                   </CardContent>
                 </Card>
@@ -197,8 +199,9 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
                     <div className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-600">
-                      {(stats.porAlocacao.find(a => a.name === 'EVENTO')?.value || 0) +
-                        (stats.porAlocacao.find(a => a.name === 'FUNCIONARIO')?.value || 0)}
+                      {stats.porAlocacao
+                        .filter(a => a.name === 'EVENTO' || a.name === 'FUNCIONARIO')
+                        .reduce((sum: number, a: any) => sum + (a.value as number), 0)}
                     </div>
                   </CardContent>
                 </Card>
