@@ -38,9 +38,10 @@ const Dashboard = () => {
 
   const loadStats = async () => {
     try {
-      const { data: itens, error } = await supabase
-        .from('itens_em_estoque')
-        .select('*');
+      const [{ data: itens, error }, { count: totalCategorias }] = await Promise.all([
+        supabase.from('itens_em_estoque').select('*'),
+        supabase.from('categorias_item').select('*', { count: 'exact', head: true }).eq('ativo', true),
+      ]);
 
       if (error) throw error;
 
@@ -86,6 +87,7 @@ const Dashboard = () => {
 
       setStats({
         total,
+        totalCategorias: totalCategorias || 0,
         porCategoria,
         porStatus,
         porAlocacao,
