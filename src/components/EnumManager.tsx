@@ -227,7 +227,7 @@ export const EnumManager = ({
                   <span className="text-xs text-muted-foreground bg-background px-2 py-1 rounded-full">
                     {itemCounts[item.nome] || 0} itens
                   </span>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-1">
                     <Button 
                       size="icon" 
                       variant="ghost" 
