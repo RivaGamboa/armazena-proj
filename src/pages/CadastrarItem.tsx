@@ -86,6 +86,68 @@ const CadastrarItem = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const preposicoes = new Set([
+    "de", "da", "do", "das", "dos", "em", "na", "no", "nas", "nos",
+    "a", "à", "ao", "às", "aos", "e", "ou", "com", "sem", "por",
+    "para", "pela", "pelo", "pelas", "pelos", "um", "uma", "uns", "umas",
+    "que", "se", "o", "os", "as",
+  ]);
+
+  const capitalizarTexto = (texto: string) => {
+    return texto
+      .toLowerCase()
+      .split(" ")
+      .map((palavra, index) => {
+        if (index === 0 || !preposicoes.has(palavra)) {
+          return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+        }
+        return palavra;
+      })
+      .join(" ");
+  };
+
+  const toggleVoiceInput = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("Seu navegador não suporta reconhecimento de voz.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      const textoCapitalizado = capitalizarTexto(transcript);
+      setFormData(prev => ({
+        ...prev,
+        nome_item: prev.nome_item ? prev.nome_item + " " + textoCapitalizado : textoCapitalizado,
+      }));
+      setIsListening(false);
+    };
+
+    recognition.onerror = () => {
+      toast.error("Erro no reconhecimento de voz. Tente novamente.");
+      setIsListening(false);
+    };
+
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+    setIsListening(true);
+  };
 
   useEffect(() => {
     if (!enumsLoading && !isEditMode && !formData.categoria_item) {
