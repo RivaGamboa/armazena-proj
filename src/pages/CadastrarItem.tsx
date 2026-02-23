@@ -231,13 +231,13 @@ const CadastrarItem = () => {
       descricao_item: "",
       status_item: statusOptions[0] || "NOVO",
       alocacao: alocacaoOptions[0] || "DEPOSITO",
-      quantidade_novo: 0,
-      quantidade_usado: 0,
-      quantidade_danificado: 0,
-      comprimento_cm: 0,
-      largura_cm: 0,
-      profundidade_cm: 0,
-      peso_kg: 0,
+      quantidade_novo: "",
+      quantidade_usado: "",
+      quantidade_danificado: "",
+      comprimento_cm: "",
+      largura_cm: "",
+      profundidade_cm: "",
+      peso_kg: "",
     });
     setImagemFiles([]);
     setVideoFile(null);
