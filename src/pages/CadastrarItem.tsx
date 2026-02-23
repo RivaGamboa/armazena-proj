@@ -49,7 +49,7 @@ function parseImageUrls(imagem_item: string | null | undefined): string[] {
 const CadastrarItem = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const itemId = searchParams.get("id");
+  const itemId = searchParams.get("id") || searchParams.get("edit");
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showLabelGenerator, setShowLabelGenerator] = useState(false);
