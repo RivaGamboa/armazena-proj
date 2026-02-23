@@ -551,7 +551,7 @@ const CadastrarItem = () => {
                 variant={isListening ? "destructive" : "outline"}
                 size="icon"
                 className="h-12 w-12 shrink-0"
-                onClick={toggleVoiceInput}
+                onClick={() => toggleVoiceInput('nome_item')}
                 title={isListening ? "Parar gravação" : "Falar nome do item"}
               >
                 {isListening ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
