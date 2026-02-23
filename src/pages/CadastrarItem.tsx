@@ -711,7 +711,7 @@ const CadastrarItem = () => {
             {allPhotoPreviews.length > 0 ? (
               <div className="grid grid-cols-2 gap-3">
                 {allPhotoPreviews.map((photo, i) => (
-                  <div key={`${photo.type}-${photo.index}`} className="relative rounded-lg overflow-hidden border group">
+                  <div key={`${photo.type}-${photo.index}`} className={`relative rounded-lg overflow-hidden border group ${i === featuredIndex ? 'ring-2 ring-primary' : ''}`}>
                     <div style={{ aspectRatio: '1 / 1' }} className="relative">
                       <img
                         src={photo.url}
@@ -725,9 +725,22 @@ const CadastrarItem = () => {
                       >
                         <X className="h-4 w-4" />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setFeaturedIndex(i)}
+                        title="Definir como destaque"
+                        className={`absolute top-2 left-2 rounded-full p-1.5 shadow-md transition-opacity ${i === featuredIndex ? 'bg-primary text-primary-foreground opacity-100' : 'bg-background/80 text-muted-foreground opacity-0 group-hover:opacity-100'}`}
+                      >
+                        <Star className={`h-4 w-4 ${i === featuredIndex ? 'fill-current' : ''}`} />
+                      </button>
                       {photo.type === 'new' && (
                         <span className="absolute bottom-2 left-2 bg-secondary text-secondary-foreground text-xs px-2 py-0.5 rounded">
                           Nova
+                        </span>
+                      )}
+                      {i === featuredIndex && (
+                        <span className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
+                          Destaque
                         </span>
                       )}
                     </div>

@@ -39,6 +39,18 @@ import Barcode from "react-barcode";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+/** Parse imagem_item field: supports JSON array or plain URL */
+function parseImageUrls(imagem_item: string | null | undefined): string[] {
+  if (!imagem_item) return [];
+  try {
+    const parsed = JSON.parse(imagem_item);
+    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+  } catch {
+    // plain URL
+  }
+  return [imagem_item];
+}
+
 interface Item {
   id_item: number;
   nome_item: string;

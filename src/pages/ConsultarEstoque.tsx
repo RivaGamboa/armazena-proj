@@ -432,7 +432,8 @@ const ConsultarEstoque = () => {
                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded flex items-center justify-center">
                         <Search className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                       </div>
-                    )}
+                    );
+                    })()}
                     {item.video_item && (
                       <div className="w-16 h-10 sm:w-20 sm:h-14 relative rounded overflow-hidden bg-muted">
                         <video
