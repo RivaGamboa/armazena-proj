@@ -17,6 +17,7 @@ const Dashboard = () => {
   const { categorias, alocacoes, statusList, refetch } = useCustomEnums();
   const [stats, setStats] = useState({
     total: 0,
+    totalCategorias: 0,
     porCategoria: [] as any[],
     porStatus: [] as any[],
     porAlocacao: [] as any[],
@@ -37,9 +38,10 @@ const Dashboard = () => {
 
   const loadStats = async () => {
     try {
-      const { data: itens, error } = await supabase
-        .from('itens_em_estoque')
-        .select('*');
+      const [{ data: itens, error }, { count: totalCategorias }] = await Promise.all([
+        supabase.from('itens_em_estoque').select('*'),
+        supabase.from('categorias_item').select('*', { count: 'exact', head: true }).eq('ativo', true),
+      ]);
 
       if (error) throw error;
 
@@ -85,6 +87,7 @@ const Dashboard = () => {
 
       setStats({
         total,
+        totalCategorias: totalCategorias || 0,
         porCategoria,
         porStatus,
         porAlocacao,
@@ -174,7 +177,7 @@ const Dashboard = () => {
                     <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   </CardHeader>
                   <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{stats.porCategoria.length}</div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{stats.totalCategorias}</div>
                   </CardContent>
                 </Card>
 
