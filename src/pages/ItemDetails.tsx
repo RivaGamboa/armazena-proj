@@ -242,6 +242,19 @@ const ItemDetails = () => {
         {item.sku && (
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
+              {(() => {
+                const imgs = parseImageUrls(item.imagem_item);
+                return imgs.length > 0 ? (
+                  <div className="text-center">
+                    <span className="text-xs text-muted-foreground block mb-2">Destaque</span>
+                    <img
+                      src={imgs[0]}
+                      alt={item.nome_item}
+                      className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-lg border"
+                    />
+                  </div>
+                ) : null;
+              })()}
               <div className="text-center">
                 <span className="text-xs text-muted-foreground block mb-2">SKU</span>
                 <div className="text-3xl sm:text-4xl font-bold font-mono">{item.sku}</div>
