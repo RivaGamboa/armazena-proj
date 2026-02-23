@@ -74,13 +74,13 @@ const CadastrarItem = () => {
     descricao_item: "",
     status_item: "",
     alocacao: "",
-    quantidade_novo: 0,
-    quantidade_usado: 0,
-    quantidade_danificado: 0,
-    comprimento_cm: 0,
-    largura_cm: 0,
-    profundidade_cm: 0,
-    peso_kg: 0,
+    quantidade_novo: "" as string | number,
+    quantidade_usado: "" as string | number,
+    quantidade_danificado: "" as string | number,
+    comprimento_cm: "" as string | number,
+    largura_cm: "" as string | number,
+    profundidade_cm: "" as string | number,
+    peso_kg: "" as string | number,
   });
   const [imagemFiles, setImagemFiles] = useState<File[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
