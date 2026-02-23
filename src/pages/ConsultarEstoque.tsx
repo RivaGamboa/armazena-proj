@@ -15,6 +15,18 @@ import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
 import { Constants } from "@/integrations/supabase/types";
 
+/** Parse imagem_item field: supports JSON array or plain URL */
+function parseImageUrls(imagem_item: string | null | undefined): string[] {
+  if (!imagem_item) return [];
+  try {
+    const parsed = JSON.parse(imagem_item);
+    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+  } catch {
+    // plain URL
+  }
+  return [imagem_item];
+}
+
 interface Item {
   id_item: number;
   nome_item: string;
