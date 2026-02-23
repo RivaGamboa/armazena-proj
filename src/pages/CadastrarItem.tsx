@@ -524,13 +524,25 @@ const CadastrarItem = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="nome">Nome do Item *</Label>
-            <Input
-              id="nome"
-              value={formData.nome_item}
-              onChange={(e) => setFormData({ ...formData, nome_item: e.target.value })}
-              required
-              className="h-12"
-            />
+            <div className="flex gap-2">
+              <Input
+                id="nome"
+                value={formData.nome_item}
+                onChange={(e) => setFormData({ ...formData, nome_item: e.target.value })}
+                required
+                className="h-12 flex-1"
+              />
+              <Button
+                type="button"
+                variant={isListening ? "destructive" : "outline"}
+                size="icon"
+                className="h-12 w-12 shrink-0"
+                onClick={toggleVoiceInput}
+                title={isListening ? "Parar gravação" : "Falar nome do item"}
+              >
+                {isListening ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
+              </Button>
+            </div>
           </div>
 
           <div>
