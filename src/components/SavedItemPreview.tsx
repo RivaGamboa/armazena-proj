@@ -151,7 +151,7 @@ export const SavedItemPreview = ({ item, onEdit, onAddNew }: SavedItemPreviewPro
           <div className="space-y-2">
             <span className="text-xs text-muted-foreground">Vídeo</span>
             <div className="rounded-lg overflow-hidden border bg-muted">
-              <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
+              <div className="relative w-full" style={{ aspectRatio: '9 / 16' }}>
                 <video
                   src={item.video_item}
                   className="absolute inset-0 w-full h-full object-cover"
