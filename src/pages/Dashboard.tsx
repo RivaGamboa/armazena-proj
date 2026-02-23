@@ -177,7 +177,7 @@ const Dashboard = () => {
                     <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   </CardHeader>
                   <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{stats.porCategoria.length}</div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{stats.totalCategorias}</div>
                   </CardContent>
                 </Card>
 
