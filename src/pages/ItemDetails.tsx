@@ -386,23 +386,30 @@ const ItemDetails = () => {
           <TabsContent value="media" className="mt-4">
             <Card className="p-4">
               <div className="space-y-6">
-                {/* Image */}
-                <div>
-                  <h3 className="text-sm font-semibold mb-3">Imagem</h3>
-                  {item.imagem_item ? (
-                    <div className="relative rounded-lg overflow-hidden bg-muted">
-                      <img
-                        src={item.imagem_item}
-                        alt={item.nome_item}
-                        className="w-full max-h-96 object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-48 bg-muted rounded-lg">
-                      <p className="text-muted-foreground text-sm">Nenhuma imagem cadastrada</p>
-                    </div>
-                  )}
-                </div>
+                {/* Images */}
+                 <div>
+                   <h3 className="text-sm font-semibold mb-3">Imagens</h3>
+                   {(() => {
+                     const imgs = parseImageUrls(item.imagem_item);
+                     return imgs.length > 0 ? (
+                       <div className="grid grid-cols-2 gap-3">
+                         {imgs.map((url, i) => (
+                           <div key={i} className="relative rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
+                             <img
+                               src={url}
+                               alt={`${item.nome_item} - Foto ${i + 1}`}
+                               className="absolute inset-0 w-full h-full object-cover"
+                             />
+                           </div>
+                         ))}
+                       </div>
+                     ) : (
+                       <div className="flex items-center justify-center h-48 bg-muted rounded-lg">
+                         <p className="text-muted-foreground text-sm">Nenhuma imagem cadastrada</p>
+                       </div>
+                     );
+                   })()}
+                 </div>
 
                 {/* Video */}
                 <div>
