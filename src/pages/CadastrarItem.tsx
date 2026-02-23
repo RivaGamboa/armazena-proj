@@ -86,6 +86,7 @@ const CadastrarItem = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
+  const [featuredIndex, setFeaturedIndex] = useState(0);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
