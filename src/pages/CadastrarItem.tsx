@@ -541,7 +541,7 @@ const CadastrarItem = () => {
                 id="qtd_novo"
                 type="number"
                 value={formData.quantidade_novo}
-                onChange={(e) => setFormData({ ...formData, quantidade_novo: parseInt(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, quantidade_novo: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
                 className="h-12"
               />
             </div>
