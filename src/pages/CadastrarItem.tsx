@@ -578,12 +578,25 @@ const CadastrarItem = () => {
 
           <div>
             <Label htmlFor="descricao">Descrição</Label>
-            <Textarea
-              id="descricao"
-              value={formData.descricao_item}
-              onChange={(e) => setFormData({ ...formData, descricao_item: e.target.value })}
-              rows={3}
-            />
+            <div className="flex gap-2">
+              <Textarea
+                id="descricao"
+                value={formData.descricao_item}
+                onChange={(e) => setFormData({ ...formData, descricao_item: e.target.value })}
+                rows={3}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant={isListeningDescricao ? "destructive" : "outline"}
+                size="icon"
+                className="h-12 w-12 shrink-0 self-start"
+                onClick={() => toggleVoiceInput('descricao_item')}
+                title={isListeningDescricao ? "Parar gravação" : "Falar descrição do item"}
+              >
+                {isListeningDescricao ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
