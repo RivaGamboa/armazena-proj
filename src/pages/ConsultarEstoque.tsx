@@ -15,6 +15,18 @@ import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
 import { Constants } from "@/integrations/supabase/types";
 
+/** Parse imagem_item field: supports JSON array or plain URL */
+function parseImageUrls(imagem_item: string | null | undefined): string[] {
+  if (!imagem_item) return [];
+  try {
+    const parsed = JSON.parse(imagem_item);
+    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+  } catch {
+    // plain URL
+  }
+  return [imagem_item];
+}
+
 interface Item {
   id_item: number;
   nome_item: string;
@@ -408,9 +420,11 @@ const ConsultarEstoque = () => {
                   )}
                   {/* Preview de Imagem */}
                   <div className="flex flex-col gap-2">
-                    {item.imagem_item ? (
+                  {(() => {
+                      const imgs = parseImageUrls(item.imagem_item);
+                      return imgs.length > 0 ? (
                       <img 
-                        src={item.imagem_item} 
+                        src={imgs[0]} 
                         alt={item.nome_item}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded"
                       />
@@ -418,7 +432,8 @@ const ConsultarEstoque = () => {
                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded flex items-center justify-center">
                         <Search className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                       </div>
-                    )}
+                    );
+                    })()}
                     {item.video_item && (
                       <div className="w-16 h-10 sm:w-20 sm:h-14 relative rounded overflow-hidden bg-muted">
                         <video

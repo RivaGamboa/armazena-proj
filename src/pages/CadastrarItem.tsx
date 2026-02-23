@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus, Mic, MicOff } from "lucide-react";
+import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus, Mic, MicOff, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import QRCodeSVG from "react-qr-code";
@@ -86,6 +86,7 @@ const CadastrarItem = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
+  const [featuredIndex, setFeaturedIndex] = useState(0);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
@@ -341,6 +342,12 @@ const CadastrarItem = () => {
           .from('item-photos')
           .getPublicUrl(videoPath);
         videoUrl = publicUrl;
+      }
+
+      // Reorder: put featured image first
+      if (featuredIndex > 0 && featuredIndex < allImageUrls.length) {
+        const featured = allImageUrls.splice(featuredIndex, 1)[0];
+        allImageUrls.unshift(featured);
       }
 
       // Store as JSON array if multiple, plain URL if single, null if none
@@ -704,7 +711,7 @@ const CadastrarItem = () => {
             {allPhotoPreviews.length > 0 ? (
               <div className="grid grid-cols-2 gap-3">
                 {allPhotoPreviews.map((photo, i) => (
-                  <div key={`${photo.type}-${photo.index}`} className="relative rounded-lg overflow-hidden border group">
+                  <div key={`${photo.type}-${photo.index}`} className={`relative rounded-lg overflow-hidden border group ${i === featuredIndex ? 'ring-2 ring-primary' : ''}`}>
                     <div style={{ aspectRatio: '1 / 1' }} className="relative">
                       <img
                         src={photo.url}
@@ -718,9 +725,22 @@ const CadastrarItem = () => {
                       >
                         <X className="h-4 w-4" />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setFeaturedIndex(i)}
+                        title="Definir como destaque"
+                        className={`absolute top-2 left-2 rounded-full p-1.5 shadow-md transition-opacity ${i === featuredIndex ? 'bg-primary text-primary-foreground opacity-100' : 'bg-background/80 text-muted-foreground opacity-0 group-hover:opacity-100'}`}
+                      >
+                        <Star className={`h-4 w-4 ${i === featuredIndex ? 'fill-current' : ''}`} />
+                      </button>
                       {photo.type === 'new' && (
                         <span className="absolute bottom-2 left-2 bg-secondary text-secondary-foreground text-xs px-2 py-0.5 rounded">
                           Nova
+                        </span>
+                      )}
+                      {i === featuredIndex && (
+                        <span className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
+                          Destaque
                         </span>
                       )}
                     </div>
