@@ -17,6 +17,7 @@ const Dashboard = () => {
   const { categorias, alocacoes, statusList, refetch } = useCustomEnums();
   const [stats, setStats] = useState({
     total: 0,
+    totalCategorias: 0,
     porCategoria: [] as any[],
     porStatus: [] as any[],
     porAlocacao: [] as any[],
