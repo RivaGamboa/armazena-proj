@@ -88,7 +88,9 @@ const CadastrarItem = () => {
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [isListening, setIsListening] = useState(false);
+  const [isListeningDescricao, setIsListeningDescricao] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const recognitionDescricaoRef = useRef<any>(null);
 
   const preposicoes = new Set([
     "de", "da", "do", "das", "dos", "em", "na", "no", "nas", "nos",
