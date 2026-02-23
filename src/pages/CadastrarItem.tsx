@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus } from "lucide-react";
+import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus, Mic, MicOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import QRCodeSVG from "react-qr-code";
@@ -86,6 +86,68 @@ const CadastrarItem = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const preposicoes = new Set([
+    "de", "da", "do", "das", "dos", "em", "na", "no", "nas", "nos",
+    "a", "à", "ao", "às", "aos", "e", "ou", "com", "sem", "por",
+    "para", "pela", "pelo", "pelas", "pelos", "um", "uma", "uns", "umas",
+    "que", "se", "o", "os", "as",
+  ]);
+
+  const capitalizarTexto = (texto: string) => {
+    return texto
+      .toLowerCase()
+      .split(" ")
+      .map((palavra, index) => {
+        if (index === 0 || !preposicoes.has(palavra)) {
+          return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+        }
+        return palavra;
+      })
+      .join(" ");
+  };
+
+  const toggleVoiceInput = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("Seu navegador não suporta reconhecimento de voz.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      const textoCapitalizado = capitalizarTexto(transcript);
+      setFormData(prev => ({
+        ...prev,
+        nome_item: prev.nome_item ? prev.nome_item + " " + textoCapitalizado : textoCapitalizado,
+      }));
+      setIsListening(false);
+    };
+
+    recognition.onerror = () => {
+      toast.error("Erro no reconhecimento de voz. Tente novamente.");
+      setIsListening(false);
+    };
+
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+    setIsListening(true);
+  };
 
   useEffect(() => {
     if (!enumsLoading && !isEditMode && !formData.categoria_item) {
@@ -462,13 +524,25 @@ const CadastrarItem = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="nome">Nome do Item *</Label>
-            <Input
-              id="nome"
-              value={formData.nome_item}
-              onChange={(e) => setFormData({ ...formData, nome_item: e.target.value })}
-              required
-              className="h-12"
-            />
+            <div className="flex gap-2">
+              <Input
+                id="nome"
+                value={formData.nome_item}
+                onChange={(e) => setFormData({ ...formData, nome_item: e.target.value })}
+                required
+                className="h-12 flex-1"
+              />
+              <Button
+                type="button"
+                variant={isListening ? "destructive" : "outline"}
+                size="icon"
+                className="h-12 w-12 shrink-0"
+                onClick={toggleVoiceInput}
+                title={isListening ? "Parar gravação" : "Falar nome do item"}
+              >
+                {isListening ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
+              </Button>
+            </div>
           </div>
 
           <div>
