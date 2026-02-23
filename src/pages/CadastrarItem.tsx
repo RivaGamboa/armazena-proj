@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Camera, Video, Tag, ScanBarcode } from "lucide-react";
+import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import QRCodeSVG from "react-qr-code";
@@ -17,6 +17,8 @@ import { SavedItemPreview } from "@/components/SavedItemPreview";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useCustomEnums } from "@/hooks/useCustomEnums";
 import { Constants } from "@/integrations/supabase/types";
+
+const MAX_PHOTOS = 4;
 
 interface SavedItem {
   id_item: number;
@@ -30,6 +32,18 @@ interface SavedItem {
   quantidade_danificado: number;
   imagem_item?: string | null;
   video_item?: string | null;
+}
+
+/** Parse imagem_item field: supports JSON array or plain URL */
+function parseImageUrls(imagem_item: string | null | undefined): string[] {
+  if (!imagem_item) return [];
+  try {
+    const parsed = JSON.parse(imagem_item);
+    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+  } catch {
+    // plain URL
+  }
+  return [imagem_item];
 }
 
 const CadastrarItem = () => {
@@ -68,9 +82,9 @@ const CadastrarItem = () => {
     profundidade_cm: 0,
     peso_kg: 0,
   });
-  const [imagemFile, setImagemFile] = useState<File | null>(null);
+  const [imagemFiles, setImagemFiles] = useState<File[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -118,7 +132,7 @@ const CadastrarItem = () => {
           profundidade_cm: data.profundidade_cm || 0,
           peso_kg: data.peso_kg || 0,
         });
-        setExistingImageUrl(data.imagem_item);
+        setExistingImageUrls(parseImageUrls(data.imagem_item));
         setExistingVideoUrl(data.video_item);
       }
     } catch (error) {
@@ -127,16 +141,35 @@ const CadastrarItem = () => {
     }
   };
 
+  const totalPhotos = existingImageUrls.length + imagemFiles.length;
+
   const handleImageCapture = () => {
+    if (totalPhotos >= MAX_PHOTOS) {
+      toast.warning(`Máximo de ${MAX_PHOTOS} fotos permitido.`);
+      return;
+    }
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'environment';
+    input.multiple = true;
     input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) setImagemFile(file);
+      const files = Array.from((e.target as HTMLInputElement).files || []);
+      const remaining = MAX_PHOTOS - totalPhotos;
+      const toAdd = files.slice(0, remaining);
+      if (files.length > remaining) {
+        toast.warning(`Apenas ${remaining} foto(s) adicionada(s). Máximo de ${MAX_PHOTOS}.`);
+      }
+      setImagemFiles(prev => [...prev, ...toAdd]);
     };
     input.click();
+  };
+
+  const removeNewPhoto = (index: number) => {
+    setImagemFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingPhoto = (index: number) => {
+    setExistingImageUrls(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleVideoCapture = () => {
@@ -180,6 +213,7 @@ const CadastrarItem = () => {
           profundidade_cm: data.profundidade_cm || 0,
           peso_kg: data.peso_kg || 0,
         });
+        setExistingImageUrls(parseImageUrls(data.imagem_item));
         setIsEditMode(true);
         toast.success("Item carregado com sucesso!");
       }
@@ -205,9 +239,9 @@ const CadastrarItem = () => {
       profundidade_cm: 0,
       peso_kg: 0,
     });
-    setImagemFile(null);
+    setImagemFiles([]);
     setVideoFile(null);
-    setExistingImageUrl(null);
+    setExistingImageUrls([]);
     setExistingVideoUrl(null);
     setIsEditMode(false);
     setSavedItem(null);
@@ -222,22 +256,17 @@ const CadastrarItem = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não autenticado");
 
-      let imagemUrl = existingImageUrl;
+      // Start with existing URLs that weren't removed
+      const allImageUrls = [...existingImageUrls];
       let videoUrl = existingVideoUrl;
 
-      if (imagemFile) {
-        const imagemPath = `${user.id}/${Date.now()}_${imagemFile.name}`;
-        const { error: imagemError } = await supabase.storage
-          .from('item-photos')
-          .upload(imagemPath, imagemFile);
-        
-        if (imagemError) throw imagemError;
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('item-photos')
-          .getPublicUrl(imagemPath);
-        
-        imagemUrl = publicUrl;
+      // Upload new photos
+      for (const file of imagemFiles) {
+        const path = `${user.id}/${Date.now()}_${file.name}`;
+        const { error } = await supabase.storage.from('item-photos').upload(path, file);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('item-photos').getPublicUrl(path);
+        allImageUrls.push(publicUrl);
       }
 
       if (videoFile) {
@@ -245,15 +274,17 @@ const CadastrarItem = () => {
         const { error: videoError } = await supabase.storage
           .from('item-photos')
           .upload(videoPath, videoFile);
-        
         if (videoError) throw videoError;
-        
         const { data: { publicUrl } } = supabase.storage
           .from('item-photos')
           .getPublicUrl(videoPath);
-        
         videoUrl = publicUrl;
       }
+
+      // Store as JSON array if multiple, plain URL if single, null if none
+      const imagemValue = allImageUrls.length > 1
+        ? JSON.stringify(allImageUrls)
+        : allImageUrls[0] || null;
 
       const itemData = {
         nome_item: formData.nome_item,
@@ -269,7 +300,7 @@ const CadastrarItem = () => {
         profundidade_cm: formData.profundidade_cm,
         peso_kg: formData.peso_kg,
         user_id: user.id,
-        ...(imagemUrl && { imagem_item: imagemUrl }),
+        imagem_item: imagemValue,
         ...(videoUrl && { video_item: videoUrl }),
       };
 
@@ -308,7 +339,7 @@ const CadastrarItem = () => {
         quantidade_novo: savedItemData.quantidade_novo,
         quantidade_usado: savedItemData.quantidade_usado,
         quantidade_danificado: savedItemData.quantidade_danificado,
-        imagem_item: imagemUrl,
+        imagem_item: imagemValue,
         video_item: videoUrl,
       });
 
@@ -370,6 +401,12 @@ const CadastrarItem = () => {
       </div>
     );
   }
+
+  // All photo previews (existing + new files)
+  const allPhotoPreviews = [
+    ...existingImageUrls.map((url, i) => ({ type: 'existing' as const, url, index: i })),
+    ...imagemFiles.map((file, i) => ({ type: 'new' as const, url: URL.createObjectURL(file), index: i })),
+  ];
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
@@ -578,40 +615,75 @@ const CadastrarItem = () => {
             />
           </div>
 
-          <div className="space-y-4">
-            {(existingImageUrl || existingVideoUrl) && !imagemFile && !videoFile && (
-              <ItemPreview 
-                imagemUrl={existingImageUrl} 
-                videoUrl={existingVideoUrl}
-                compact
-              />
-            )}
+          {/* Fotos Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Fotos ({totalPhotos}/{MAX_PHOTOS})</Label>
+              {totalPhotos < MAX_PHOTOS && (
+                <Button type="button" variant="outline" size="sm" onClick={handleImageCapture}>
+                  <ImagePlus className="h-4 w-4 mr-2" />
+                  Adicionar Foto
+                </Button>
+              )}
+            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-16 flex flex-col"
+            {allPhotoPreviews.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                {allPhotoPreviews.map((photo, i) => (
+                  <div key={`${photo.type}-${photo.index}`} className="relative rounded-lg overflow-hidden border group">
+                    <div style={{ aspectRatio: '1 / 1' }} className="relative">
+                      <img
+                        src={photo.url}
+                        alt={`Foto ${i + 1}`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => photo.type === 'existing' ? removeExistingPhoto(photo.index) : removeNewPhoto(photo.index)}
+                        className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                      {photo.type === 'new' && (
+                        <span className="absolute bottom-2 left-2 bg-secondary text-secondary-foreground text-xs px-2 py-0.5 rounded">
+                          Nova
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div
+                className="w-full h-32 rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer"
                 onClick={handleImageCapture}
               >
-                <Camera className="h-6 w-6 mb-1" />
-                <span className="text-xs">
-                  {imagemFile ? imagemFile.name.substring(0, 15) : existingImageUrl ? "Alterar Foto" : "Tirar Foto"}
-                </span>
-              </Button>
+                <Camera className="h-8 w-8 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Clique para adicionar fotos</span>
+              </div>
+            )}
+          </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                className="h-16 flex flex-col"
-                onClick={handleVideoCapture}
-              >
-                <Video className="h-6 w-6 mb-1" />
-                <span className="text-xs">
-                  {videoFile ? videoFile.name.substring(0, 15) : existingVideoUrl ? "Alterar Vídeo" : "Gravar Vídeo"}
-                </span>
-              </Button>
-            </div>
+          {/* Video Section */}
+          <div className="space-y-3">
+            {existingVideoUrl && !videoFile && (
+              <div className="rounded-lg overflow-hidden border bg-muted">
+                <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
+                  <video src={existingVideoUrl} className="absolute inset-0 w-full h-full object-cover" controls />
+                </div>
+              </div>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-14 flex flex-col"
+              onClick={handleVideoCapture}
+            >
+              <Video className="h-6 w-6 mb-1" />
+              <span className="text-xs">
+                {videoFile ? videoFile.name.substring(0, 20) : existingVideoUrl ? "Alterar Vídeo" : "Gravar Vídeo"}
+              </span>
+            </Button>
           </div>
 
           <Button 
