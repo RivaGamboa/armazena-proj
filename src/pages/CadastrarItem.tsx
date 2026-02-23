@@ -575,7 +575,7 @@ const CadastrarItem = () => {
                 type="number"
                 step="0.01"
                 value={formData.comprimento_cm}
-                onChange={(e) => setFormData({ ...formData, comprimento_cm: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, comprimento_cm: e.target.value === '' ? '' : parseFloat(e.target.value) || 0 })}
                 className="h-12"
               />
             </div>
