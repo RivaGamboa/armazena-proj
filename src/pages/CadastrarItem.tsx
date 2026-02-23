@@ -344,6 +344,12 @@ const CadastrarItem = () => {
         videoUrl = publicUrl;
       }
 
+      // Reorder: put featured image first
+      if (featuredIndex > 0 && featuredIndex < allImageUrls.length) {
+        const featured = allImageUrls.splice(featuredIndex, 1)[0];
+        allImageUrls.unshift(featured);
+      }
+
       // Store as JSON array if multiple, plain URL if single, null if none
       const imagemValue = allImageUrls.length > 1
         ? JSON.stringify(allImageUrls)
