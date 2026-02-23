@@ -1,9 +1,22 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Plus, Package } from "lucide-react";
+import { Pencil, Plus, Package, Trash2 } from "lucide-react";
 import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
+
+/** Parse imagem_item field: supports JSON array or plain URL */
+function parseImageUrls(imagem_item: string | null | undefined): string[] {
+  if (!imagem_item) return [];
+  try {
+    const parsed = JSON.parse(imagem_item);
+    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+  } catch {
+    // plain URL
+  }
+  return [imagem_item];
+}
 
 interface SavedItemPreviewProps {
   item: {
@@ -25,6 +38,11 @@ interface SavedItemPreviewProps {
 
 export const SavedItemPreview = ({ item, onEdit, onAddNew }: SavedItemPreviewProps) => {
   const totalQuantity = item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado;
+  const [photos, setPhotos] = useState<string[]>(() => parseImageUrls(item.imagem_item));
+
+  const removePhoto = (index: number) => {
+    setPhotos(prev => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <Card className="border-2 border-primary/20 bg-gradient-to-br from-card to-primary/5 shadow-lg animate-in fade-in-50 duration-500">
@@ -101,31 +119,46 @@ export const SavedItemPreview = ({ item, onEdit, onAddNew }: SavedItemPreviewPro
           </div>
         </div>
 
-        {/* Preview de Mídia */}
-        {(item.imagem_item || item.video_item) && (
-          <div className="space-y-4">
-            {item.imagem_item && (
-              <div className="rounded-lg overflow-hidden border">
-                <div className="relative w-full" style={{ aspectRatio: '1 / 1' }}>
-                  <img
-                    src={item.imagem_item}
-                    alt={item.nome_item}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
+        {/* Grade de Fotos 1:1 */}
+        {photos.length > 0 && (
+          <div className="space-y-2">
+            <span className="text-xs text-muted-foreground">Fotos ({photos.length})</span>
+            <div className="grid grid-cols-2 gap-3">
+              {photos.map((url, index) => (
+                <div key={index} className="relative rounded-lg overflow-hidden border group">
+                  <div style={{ aspectRatio: '1 / 1' }} className="relative">
+                    <img
+                      src={url}
+                      alt={`${item.nome_item} - Foto ${index + 1}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(index)}
+                      className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Vídeo 16:9 */}
+        {item.video_item && (
+          <div className="space-y-2">
+            <span className="text-xs text-muted-foreground">Vídeo</span>
+            <div className="rounded-lg overflow-hidden border bg-muted">
+              <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
+                <video
+                  src={item.video_item}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  controls
+                />
               </div>
-            )}
-            {item.video_item && (
-              <div className="rounded-lg overflow-hidden border bg-muted">
-                <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
-                  <video
-                    src={item.video_item}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    controls
-                  />
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
 
