@@ -88,7 +88,9 @@ const CadastrarItem = () => {
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [isListening, setIsListening] = useState(false);
+  const [isListeningDescricao, setIsListeningDescricao] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const recognitionDescricaoRef = useRef<any>(null);
 
   const preposicoes = new Set([
     "de", "da", "do", "das", "dos", "em", "na", "no", "nas", "nos",
@@ -110,16 +112,21 @@ const CadastrarItem = () => {
       .join(" ");
   };
 
-  const toggleVoiceInput = () => {
+  const toggleVoiceInput = (field: 'nome_item' | 'descricao_item') => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Seu navegador não suporta reconhecimento de voz.");
       return;
     }
 
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
+    const isNome = field === 'nome_item';
+    const listening = isNome ? isListening : isListeningDescricao;
+    const setListening = isNome ? setIsListening : setIsListeningDescricao;
+    const refObj = isNome ? recognitionRef : recognitionDescricaoRef;
+
+    if (listening) {
+      refObj.current?.stop();
+      setListening(false);
       return;
     }
 
@@ -127,27 +134,27 @@ const CadastrarItem = () => {
     recognition.lang = "pt-BR";
     recognition.continuous = false;
     recognition.interimResults = false;
-    recognitionRef.current = recognition;
+    refObj.current = recognition;
 
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
-      const textoCapitalizado = capitalizarTexto(transcript);
+      const texto = isNome ? capitalizarTexto(transcript) : transcript.charAt(0).toUpperCase() + transcript.slice(1);
       setFormData(prev => ({
         ...prev,
-        nome_item: prev.nome_item ? prev.nome_item + " " + textoCapitalizado : textoCapitalizado,
+        [field]: prev[field] ? prev[field] + " " + texto : texto,
       }));
-      setIsListening(false);
+      setListening(false);
     };
 
     recognition.onerror = () => {
       toast.error("Erro no reconhecimento de voz. Tente novamente.");
-      setIsListening(false);
+      setListening(false);
     };
 
-    recognition.onend = () => setIsListening(false);
+    recognition.onend = () => setListening(false);
 
     recognition.start();
-    setIsListening(true);
+    setListening(true);
   };
 
   useEffect(() => {
@@ -544,7 +551,7 @@ const CadastrarItem = () => {
                 variant={isListening ? "destructive" : "outline"}
                 size="icon"
                 className="h-12 w-12 shrink-0"
-                onClick={toggleVoiceInput}
+                onClick={() => toggleVoiceInput('nome_item')}
                 title={isListening ? "Parar gravação" : "Falar nome do item"}
               >
                 {isListening ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
@@ -571,12 +578,25 @@ const CadastrarItem = () => {
 
           <div>
             <Label htmlFor="descricao">Descrição</Label>
-            <Textarea
-              id="descricao"
-              value={formData.descricao_item}
-              onChange={(e) => setFormData({ ...formData, descricao_item: e.target.value })}
-              rows={3}
-            />
+            <div className="flex gap-2">
+              <Textarea
+                id="descricao"
+                value={formData.descricao_item}
+                onChange={(e) => setFormData({ ...formData, descricao_item: e.target.value })}
+                rows={3}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant={isListeningDescricao ? "destructive" : "outline"}
+                size="icon"
+                className="h-12 w-12 shrink-0 self-start"
+                onClick={() => toggleVoiceInput('descricao_item')}
+                title={isListeningDescricao ? "Parar gravação" : "Falar descrição do item"}
+              >
+                {isListeningDescricao ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
