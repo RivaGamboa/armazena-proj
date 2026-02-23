@@ -610,7 +610,7 @@ const CadastrarItem = () => {
               type="number"
               step="0.01"
               value={formData.peso_kg}
-              onChange={(e) => setFormData({ ...formData, peso_kg: parseFloat(e.target.value) || 0 })}
+              onChange={(e) => setFormData({ ...formData, peso_kg: e.target.value === '' ? '' : parseFloat(e.target.value) || 0 })}
               className="h-12"
             />
           </div>
