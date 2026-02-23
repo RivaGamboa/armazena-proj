@@ -74,13 +74,13 @@ const CadastrarItem = () => {
     descricao_item: "",
     status_item: "",
     alocacao: "",
-    quantidade_novo: 0,
-    quantidade_usado: 0,
-    quantidade_danificado: 0,
-    comprimento_cm: 0,
-    largura_cm: 0,
-    profundidade_cm: 0,
-    peso_kg: 0,
+    quantidade_novo: "" as string | number,
+    quantidade_usado: "" as string | number,
+    quantidade_danificado: "" as string | number,
+    comprimento_cm: "" as string | number,
+    largura_cm: "" as string | number,
+    profundidade_cm: "" as string | number,
+    peso_kg: "" as string | number,
   });
   const [imagemFiles, setImagemFiles] = useState<File[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -231,13 +231,13 @@ const CadastrarItem = () => {
       descricao_item: "",
       status_item: statusOptions[0] || "NOVO",
       alocacao: alocacaoOptions[0] || "DEPOSITO",
-      quantidade_novo: 0,
-      quantidade_usado: 0,
-      quantidade_danificado: 0,
-      comprimento_cm: 0,
-      largura_cm: 0,
-      profundidade_cm: 0,
-      peso_kg: 0,
+      quantidade_novo: "",
+      quantidade_usado: "",
+      quantidade_danificado: "",
+      comprimento_cm: "",
+      largura_cm: "",
+      profundidade_cm: "",
+      peso_kg: "",
     });
     setImagemFiles([]);
     setVideoFile(null);
@@ -292,13 +292,13 @@ const CadastrarItem = () => {
         descricao_item: formData.descricao_item,
         status_item: formData.status_item as any,
         alocacao: formData.alocacao as any,
-        quantidade_novo: formData.quantidade_novo,
-        quantidade_usado: formData.quantidade_usado,
-        quantidade_danificado: formData.quantidade_danificado,
-        comprimento_cm: formData.comprimento_cm,
-        largura_cm: formData.largura_cm,
-        profundidade_cm: formData.profundidade_cm,
-        peso_kg: formData.peso_kg,
+        quantidade_novo: Number(formData.quantidade_novo) || 0,
+        quantidade_usado: Number(formData.quantidade_usado) || 0,
+        quantidade_danificado: Number(formData.quantidade_danificado) || 0,
+        comprimento_cm: Number(formData.comprimento_cm) || 0,
+        largura_cm: Number(formData.largura_cm) || 0,
+        profundidade_cm: Number(formData.profundidade_cm) || 0,
+        peso_kg: Number(formData.peso_kg) || 0,
         user_id: user.id,
         imagem_item: imagemValue,
         ...(videoUrl && { video_item: videoUrl }),
@@ -541,7 +541,7 @@ const CadastrarItem = () => {
                 id="qtd_novo"
                 type="number"
                 value={formData.quantidade_novo}
-                onChange={(e) => setFormData({ ...formData, quantidade_novo: parseInt(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, quantidade_novo: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
                 className="h-12"
               />
             </div>
@@ -551,7 +551,7 @@ const CadastrarItem = () => {
                 id="qtd_usado"
                 type="number"
                 value={formData.quantidade_usado}
-                onChange={(e) => setFormData({ ...formData, quantidade_usado: parseInt(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, quantidade_usado: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
                 className="h-12"
               />
             </div>
@@ -561,7 +561,7 @@ const CadastrarItem = () => {
                 id="qtd_danificado"
                 type="number"
                 value={formData.quantidade_danificado}
-                onChange={(e) => setFormData({ ...formData, quantidade_danificado: parseInt(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, quantidade_danificado: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
                 className="h-12"
               />
             </div>
@@ -575,7 +575,7 @@ const CadastrarItem = () => {
                 type="number"
                 step="0.01"
                 value={formData.comprimento_cm}
-                onChange={(e) => setFormData({ ...formData, comprimento_cm: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, comprimento_cm: e.target.value === '' ? '' : parseFloat(e.target.value) || 0 })}
                 className="h-12"
               />
             </div>
@@ -586,7 +586,7 @@ const CadastrarItem = () => {
                 type="number"
                 step="0.01"
                 value={formData.largura_cm}
-                onChange={(e) => setFormData({ ...formData, largura_cm: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, largura_cm: e.target.value === '' ? '' : parseFloat(e.target.value) || 0 })}
                 className="h-12"
               />
             </div>
@@ -597,7 +597,7 @@ const CadastrarItem = () => {
                 type="number"
                 step="0.01"
                 value={formData.profundidade_cm}
-                onChange={(e) => setFormData({ ...formData, profundidade_cm: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, profundidade_cm: e.target.value === '' ? '' : parseFloat(e.target.value) || 0 })}
                 className="h-12"
               />
             </div>
@@ -610,7 +610,7 @@ const CadastrarItem = () => {
               type="number"
               step="0.01"
               value={formData.peso_kg}
-              onChange={(e) => setFormData({ ...formData, peso_kg: parseFloat(e.target.value) || 0 })}
+              onChange={(e) => setFormData({ ...formData, peso_kg: e.target.value === '' ? '' : parseFloat(e.target.value) || 0 })}
               className="h-12"
             />
           </div>
