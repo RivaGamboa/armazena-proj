@@ -420,9 +420,11 @@ const ConsultarEstoque = () => {
                   )}
                   {/* Preview de Imagem */}
                   <div className="flex flex-col gap-2">
-                    {item.imagem_item ? (
+                  {(() => {
+                      const imgs = parseImageUrls(item.imagem_item);
+                      return imgs.length > 0 ? (
                       <img 
-                        src={item.imagem_item} 
+                        src={imgs[0]} 
                         alt={item.nome_item}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded"
                       />
