@@ -50,16 +50,16 @@ interface Item {
 const ConsultarEstoque = () => {
   const navigate = useNavigate();
   const [busca, setBusca] = useState("");
-  const [chatMessage, setChatMessage] = useState("");
   const [itens, setItens] = useState<Item[]>([]);
   const [filteredItens, setFilteredItens] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
-  const [chatLoading, setChatLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFiltersState>(initialFilters);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const categorias = Constants.public.Enums.categoria_item_enum;
   const statusList = Constants.public.Enums.status_item_enum;
