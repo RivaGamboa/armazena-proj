@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Search, ScanBarcode } from "lucide-react";
+import { ArrowLeft, Search, ScanBarcode, Mic, MicOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { ItemPreview } from "@/components/ItemPreview";
+import { useRef } from "react";
 
 const DevolverItem = () => {
   const navigate = useNavigate();
@@ -20,6 +21,27 @@ const DevolverItem = () => {
   const [selectedItem, setSelectedItem] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [showScanner, setShowScanner] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const toggleVoiceSearch = () => {
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) { toast.error("Seu navegador não suporta reconhecimento de voz"); return; }
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;
+    recognition.onresult = (event: any) => { setSearchTerm(event.results[0][0].transcript); setIsListening(false); };
+    recognition.onerror = () => { setIsListening(false); };
+    recognition.onend = () => { setIsListening(false); };
+    recognition.start();
+    setIsListening(true);
+  };
 
   const selectedItemData = itens.find(i => i.id_item.toString() === selectedItem);
 
@@ -123,6 +145,15 @@ const DevolverItem = () => {
                   className="pl-10"
                 />
               </div>
+              <Button
+                type="button"
+                size="icon"
+                variant={isListening ? "destructive" : "outline"}
+                onClick={toggleVoiceSearch}
+                className={isListening ? "animate-pulse" : ""}
+              >
+                {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+              </Button>
               <Button
                 type="button"
                 size="icon"
