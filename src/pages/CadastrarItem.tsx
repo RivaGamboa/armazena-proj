@@ -162,7 +162,7 @@ const CadastrarItem = () => {
         ...prev,
         categoria_item: categoriaOptions[0] || "Ferramentas",
         alocacao: alocacaoOptions[0] || "DEPOSITO",
-        status_item: statusOptions[0] || "NOVO",
+        status_item: statusOptions[0] || "ITEM NOVO",
       }));
     }
   }, [enumsLoading, isEditMode]);
