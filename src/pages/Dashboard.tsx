@@ -353,10 +353,19 @@ const Dashboard = () => {
               </Tabs>
 
               <Card className="bg-muted/30">
-                <CardContent className="pt-6">
+                <CardContent className="pt-6 space-y-4">
                   <p className="text-sm text-muted-foreground text-center">
                     Gerencie Categorias, Alocações e Status nas abas acima. Valores em uso não podem ser excluídos.
                   </p>
+                  <div className="border-t pt-4">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">📋 Referência de Status (padrão):</p>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li><strong>ITEM NOVO</strong> — Produto novo ou com aspecto de novo</li>
+                      <li><strong>ITEM USADO</strong> — Produto usado mas ainda usável</li>
+                      <li><strong>ITEM USADO COM AVARIA</strong> — Produto que pode ser aproveitado embora avariado</li>
+                      <li><strong>AVARIA/DESCARTE</strong> — Produto disponível para reciclagem</li>
+                    </ul>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
