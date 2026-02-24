@@ -164,6 +164,15 @@ const RetirarItem = () => {
               <Button
                 type="button"
                 size="icon"
+                variant={isListening ? "destructive" : "outline"}
+                onClick={toggleVoiceSearch}
+                className={isListening ? "animate-pulse" : ""}
+              >
+                {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+              </Button>
+              <Button
+                type="button"
+                size="icon"
                 variant="outline"
                 onClick={() => setShowScanner(true)}
               >
