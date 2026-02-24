@@ -636,38 +636,50 @@ const CadastrarItem = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="qtd_novo">Qtd. Novo</Label>
-              <Input
-                id="qtd_novo"
-                type="number"
-                value={formData.quantidade_novo}
-                onChange={(e) => setFormData({ ...formData, quantidade_novo: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
-                className="h-12"
-              />
+          {/* Quantidades por Status */}
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Quantidade por Status</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {statusOptions.map((status) => (
+                <div key={status}>
+                  <Label htmlFor={`qty_${status}`} className="text-xs text-muted-foreground">{status}</Label>
+                  <Input
+                    id={`qty_${status}`}
+                    type="number"
+                    min="0"
+                    value={formData.quantidades_por_status[status] ?? ''}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      quantidades_por_status: {
+                        ...formData.quantidades_por_status,
+                        [status]: e.target.value === '' ? '' : parseInt(e.target.value) || 0
+                      }
+                    })}
+                    className="h-12"
+                  />
+                </div>
+              ))}
             </div>
-            <div>
-              <Label htmlFor="qtd_usado">Qtd. Usado</Label>
-              <Input
-                id="qtd_usado"
-                type="number"
-                value={formData.quantidade_usado}
-                onChange={(e) => setFormData({ ...formData, quantidade_usado: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
-                className="h-12"
-              />
-            </div>
-            <div>
-              <Label htmlFor="qtd_danificado">Qtd. Danificado</Label>
-              <Input
-                id="qtd_danificado"
-                type="number"
-                value={formData.quantidade_danificado}
-                onChange={(e) => setFormData({ ...formData, quantidade_danificado: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
-                className="h-12"
-              />
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
+              <span className="text-sm font-medium">Quantidade Total</span>
+              <span className="text-lg font-bold text-primary">
+                {Object.values(formData.quantidades_por_status).reduce((sum, v) => sum + (Number(v) || 0), 0)}
+              </span>
             </div>
           </div>
+
+          {/* Quadro explicativo dos status */}
+          <Card className="bg-muted/30 border-dashed">
+            <CardContent className="pt-4 pb-3">
+              <p className="text-xs font-semibold text-muted-foreground mb-2">📋 Referência de Status:</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li><strong>ITEM NOVO</strong> — Produto novo ou com aspecto de novo</li>
+                <li><strong>ITEM USADO</strong> — Produto usado mas ainda usável</li>
+                <li><strong>ITEM USADO COM AVARIA</strong> — Produto que pode ser aproveitado embora avariado</li>
+                <li><strong>AVARIA/DESCARTE</strong> — Produto disponível para reciclagem</li>
+              </ul>
+            </CardContent>
+          </Card>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
