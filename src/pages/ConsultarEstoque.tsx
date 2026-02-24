@@ -153,8 +153,9 @@ const ConsultarEstoque = () => {
     if (filters.quantidadeMax) {
       const max = parseInt(filters.quantidadeMax);
       filtered = filtered.filter(item => {
-        const total = item.quantidades_por_status
-          ? Object.values(item.quantidades_por_status).reduce((s, v) => s + (v || 0), 0)
+        const qps = item.quantidades_por_status as Record<string, number> | null;
+        const total = qps
+          ? Object.values(qps).reduce((s: number, v: number) => s + (v || 0), 0)
           : item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
         return total <= max;
       });
