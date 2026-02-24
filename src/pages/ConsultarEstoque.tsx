@@ -456,13 +456,16 @@ const ConsultarEstoque = () => {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
-                      {item.quantidades_por_status
-                        ? Object.entries(item.quantidades_por_status)
-                            .filter(([_, v]) => v > 0)
-                            .map(([status, qty]) => `${status}: ${qty}`)
-                            .join(' | ') || 'Sem estoque'
-                        : `N: ${item.quantidade_novo} | U: ${item.quantidade_usado} | D: ${item.quantidade_danificado}`
-                      }
+                      {(() => {
+                        const qps = item.quantidades_por_status as Record<string, number> | null;
+                        if (qps) {
+                          const entries = Object.entries(qps).filter(([_, v]) => (v as number) > 0);
+                          return entries.length > 0
+                            ? entries.map(([status, qty]) => `${status}: ${qty}`).join(' | ')
+                            : 'Sem estoque';
+                        }
+                        return `N: ${item.quantidade_novo} | U: ${item.quantidade_usado} | D: ${item.quantidade_danificado}`;
+                      })()}
                     </p>
                   </div>
                 </div>
