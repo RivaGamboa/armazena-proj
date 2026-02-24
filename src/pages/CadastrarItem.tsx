@@ -27,9 +27,7 @@ interface SavedItem {
   categoria_item: string;
   status_item: string;
   alocacao: string;
-  quantidade_novo: number;
-  quantidade_usado: number;
-  quantidade_danificado: number;
+  quantidades_por_status: Record<string, number>;
   imagem_item?: string | null;
   video_item?: string | null;
 }
