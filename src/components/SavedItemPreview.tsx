@@ -26,9 +26,7 @@ interface SavedItemPreviewProps {
     categoria_item: string;
     status_item: string;
     alocacao: string;
-    quantidade_novo: number;
-    quantidade_usado: number;
-    quantidade_danificado: number;
+    quantidades_por_status: Record<string, number>;
     imagem_item?: string | null;
     video_item?: string | null;
   };
@@ -37,12 +35,14 @@ interface SavedItemPreviewProps {
 }
 
 export const SavedItemPreview = ({ item, onEdit, onAddNew }: SavedItemPreviewProps) => {
-  const totalQuantity = item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado;
+  const totalQuantity = Object.values(item.quantidades_por_status || {}).reduce((sum, v) => sum + (v || 0), 0);
   const [photos, setPhotos] = useState<string[]>(() => parseImageUrls(item.imagem_item));
 
   const removePhoto = (index: number) => {
     setPhotos(prev => prev.filter((_, i) => i !== index));
   };
+
+  const statusEntries = Object.entries(item.quantidades_por_status || {}).filter(([_, v]) => v > 0);
 
   return (
     <Card className="border-2 border-primary/20 bg-gradient-to-br from-card to-primary/5 shadow-lg animate-in fade-in-50 duration-500">
@@ -96,25 +96,19 @@ export const SavedItemPreview = ({ item, onEdit, onAddNew }: SavedItemPreviewPro
           </div>
         </div>
 
-        {/* Quantidades */}
+        {/* Quantidades por Status */}
         <div className="bg-muted/50 rounded-lg p-4">
-          <span className="text-xs text-muted-foreground block mb-2">Quantidades</span>
-          <div className="grid grid-cols-4 gap-2 text-center">
-            <div>
-              <div className="text-lg font-bold text-emerald-600">{item.quantidade_novo}</div>
-              <span className="text-xs text-muted-foreground">Novo</span>
-            </div>
-            <div>
-              <div className="text-lg font-bold text-amber-600">{item.quantidade_usado}</div>
-              <span className="text-xs text-muted-foreground">Usado</span>
-            </div>
-            <div>
-              <div className="text-lg font-bold text-red-600">{item.quantidade_danificado}</div>
-              <span className="text-xs text-muted-foreground">Danificado</span>
-            </div>
-            <div>
-              <div className="text-lg font-bold text-primary">{totalQuantity}</div>
-              <span className="text-xs text-muted-foreground">Total</span>
+          <span className="text-xs text-muted-foreground block mb-2">Quantidades por Status</span>
+          <div className="grid grid-cols-2 gap-2">
+            {statusEntries.map(([status, qty]) => (
+              <div key={status} className="text-center p-2 bg-background rounded-lg border">
+                <div className="text-lg font-bold text-primary">{qty}</div>
+                <span className="text-xs text-muted-foreground">{status}</span>
+              </div>
+            ))}
+            <div className="text-center p-2 bg-primary/10 rounded-lg border border-primary/20 col-span-2">
+              <div className="text-xl font-bold text-primary">{totalQuantity}</div>
+              <span className="text-xs text-muted-foreground font-medium">Total</span>
             </div>
           </div>
         </div>

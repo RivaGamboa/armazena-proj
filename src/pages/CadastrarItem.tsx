@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus, Mic, MicOff, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,9 +28,7 @@ interface SavedItem {
   categoria_item: string;
   status_item: string;
   alocacao: string;
-  quantidade_novo: number;
-  quantidade_usado: number;
-  quantidade_danificado: number;
+  quantidades_por_status: Record<string, number>;
   imagem_item?: string | null;
   video_item?: string | null;
 }
@@ -57,6 +56,8 @@ const CadastrarItem = () => {
   const [savedItem, setSavedItem] = useState<SavedItem | null>(null);
   const { categorias, alocacoes, statusList, loading: enumsLoading } = useCustomEnums();
   
+  const DEFAULT_STATUS_OPTIONS = ['ITEM NOVO', 'ITEM USADO', 'ITEM USADO COM AVARIA', 'AVARIA/DESCARTE'];
+  
   const categoriaOptions = categorias.length > 0 
     ? categorias.map(c => c.nome) 
     : Constants.public.Enums.categoria_item_enum;
@@ -65,7 +66,7 @@ const CadastrarItem = () => {
     : Constants.public.Enums.alocacao_enum;
   const statusOptions = statusList.length > 0 
     ? statusList.map(s => s.nome) 
-    : Constants.public.Enums.status_item_enum;
+    : DEFAULT_STATUS_OPTIONS;
 
   const [formData, setFormData] = useState({
     sku: "",
@@ -74,9 +75,7 @@ const CadastrarItem = () => {
     descricao_item: "",
     status_item: "",
     alocacao: "",
-    quantidade_novo: "" as string | number,
-    quantidade_usado: "" as string | number,
-    quantidade_danificado: "" as string | number,
+    quantidades_por_status: {} as Record<string, number | string>,
     comprimento_cm: "" as string | number,
     largura_cm: "" as string | number,
     profundidade_cm: "" as string | number,
@@ -163,7 +162,7 @@ const CadastrarItem = () => {
         ...prev,
         categoria_item: categoriaOptions[0] || "Ferramentas",
         alocacao: alocacaoOptions[0] || "DEPOSITO",
-        status_item: statusOptions[0] || "NOVO",
+        status_item: statusOptions[0] || "ITEM NOVO",
       }));
     }
   }, [enumsLoading, isEditMode]);
@@ -187,6 +186,7 @@ const CadastrarItem = () => {
       if (error) throw error;
 
       if (data) {
+        const qps = (data as any).quantidades_por_status || {};
         setFormData({
           sku: data.sku || "",
           nome_item: data.nome_item,
@@ -194,9 +194,7 @@ const CadastrarItem = () => {
           descricao_item: data.descricao_item || "",
           status_item: data.status_item,
           alocacao: data.alocacao,
-          quantidade_novo: data.quantidade_novo,
-          quantidade_usado: data.quantidade_usado,
-          quantidade_danificado: data.quantidade_danificado,
+          quantidades_por_status: qps,
           comprimento_cm: data.comprimento_cm || 0,
           largura_cm: data.largura_cm || 0,
           profundidade_cm: data.profundidade_cm || 0,
@@ -268,6 +266,7 @@ const CadastrarItem = () => {
       }
 
       if (data) {
+        const qps = (data as any).quantidades_por_status || {};
         setFormData({
           sku: data.sku || "",
           nome_item: data.nome_item,
@@ -275,9 +274,7 @@ const CadastrarItem = () => {
           descricao_item: data.descricao_item || "",
           status_item: data.status_item,
           alocacao: data.alocacao,
-          quantidade_novo: data.quantidade_novo,
-          quantidade_usado: data.quantidade_usado,
-          quantidade_danificado: data.quantidade_danificado,
+          quantidades_por_status: qps,
           comprimento_cm: data.comprimento_cm || 0,
           largura_cm: data.largura_cm || 0,
           profundidade_cm: data.profundidade_cm || 0,
@@ -299,11 +296,9 @@ const CadastrarItem = () => {
       nome_item: "",
       categoria_item: categoriaOptions[0] || "Ferramentas",
       descricao_item: "",
-      status_item: statusOptions[0] || "NOVO",
+      status_item: statusOptions[0] || "ITEM NOVO",
       alocacao: alocacaoOptions[0] || "DEPOSITO",
-      quantidade_novo: "",
-      quantidade_usado: "",
-      quantidade_danificado: "",
+      quantidades_por_status: {},
       comprimento_cm: "",
       largura_cm: "",
       profundidade_cm: "",
@@ -362,15 +357,24 @@ const CadastrarItem = () => {
         ? JSON.stringify(allImageUrls)
         : allImageUrls[0] || null;
 
+      // Build clean quantidades_por_status with numeric values
+      const cleanQuantidades: Record<string, number> = {};
+      for (const [key, val] of Object.entries(formData.quantidades_por_status)) {
+        cleanQuantidades[key] = Number(val) || 0;
+      }
+      const totalQty = Object.values(cleanQuantidades).reduce((sum, v) => sum + v, 0);
+
       const itemData = {
         nome_item: formData.nome_item,
         categoria_item: formData.categoria_item as any,
         descricao_item: formData.descricao_item,
         status_item: formData.status_item as any,
         alocacao: formData.alocacao as any,
-        quantidade_novo: Number(formData.quantidade_novo) || 0,
-        quantidade_usado: Number(formData.quantidade_usado) || 0,
-        quantidade_danificado: Number(formData.quantidade_danificado) || 0,
+        quantidade_novo: cleanQuantidades[statusOptions[0]] || 0,
+        quantidade_usado: cleanQuantidades[statusOptions[1]] || 0,
+        quantidade_danificado: cleanQuantidades[statusOptions[2]] || 0,
+        quantidade_em_manutencao: cleanQuantidades[statusOptions[3]] || 0,
+        quantidades_por_status: cleanQuantidades,
         comprimento_cm: Number(formData.comprimento_cm) || 0,
         largura_cm: Number(formData.largura_cm) || 0,
         profundidade_cm: Number(formData.profundidade_cm) || 0,
@@ -391,7 +395,7 @@ const CadastrarItem = () => {
           .single();
 
         if (error) throw error;
-        savedItemData = data;
+        savedItemData = data as any;
         toast.success("Item atualizado com sucesso!");
       } else {
         const { data, error } = await supabase
@@ -401,7 +405,7 @@ const CadastrarItem = () => {
           .single();
 
         if (error) throw error;
-        savedItemData = data;
+        savedItemData = data as any;
         toast.success("Item cadastrado com sucesso!");
       }
 
@@ -412,9 +416,7 @@ const CadastrarItem = () => {
         categoria_item: savedItemData.categoria_item,
         status_item: savedItemData.status_item,
         alocacao: savedItemData.alocacao,
-        quantidade_novo: savedItemData.quantidade_novo,
-        quantidade_usado: savedItemData.quantidade_usado,
-        quantidade_danificado: savedItemData.quantidade_danificado,
+        quantidades_por_status: cleanQuantidades,
         imagem_item: imagemValue,
         video_item: videoUrl,
       });
@@ -635,38 +637,50 @@ const CadastrarItem = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="qtd_novo">Qtd. Novo</Label>
-              <Input
-                id="qtd_novo"
-                type="number"
-                value={formData.quantidade_novo}
-                onChange={(e) => setFormData({ ...formData, quantidade_novo: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
-                className="h-12"
-              />
+          {/* Quantidades por Status */}
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Quantidade por Status</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {statusOptions.map((status) => (
+                <div key={status}>
+                  <Label htmlFor={`qty_${status}`} className="text-xs text-muted-foreground">{status}</Label>
+                  <Input
+                    id={`qty_${status}`}
+                    type="number"
+                    min="0"
+                    value={formData.quantidades_por_status[status] ?? ''}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      quantidades_por_status: {
+                        ...formData.quantidades_por_status,
+                        [status]: e.target.value === '' ? '' : parseInt(e.target.value) || 0
+                      }
+                    })}
+                    className="h-12"
+                  />
+                </div>
+              ))}
             </div>
-            <div>
-              <Label htmlFor="qtd_usado">Qtd. Usado</Label>
-              <Input
-                id="qtd_usado"
-                type="number"
-                value={formData.quantidade_usado}
-                onChange={(e) => setFormData({ ...formData, quantidade_usado: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
-                className="h-12"
-              />
-            </div>
-            <div>
-              <Label htmlFor="qtd_danificado">Qtd. Danificado</Label>
-              <Input
-                id="qtd_danificado"
-                type="number"
-                value={formData.quantidade_danificado}
-                onChange={(e) => setFormData({ ...formData, quantidade_danificado: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
-                className="h-12"
-              />
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
+              <span className="text-sm font-medium">Quantidade Total</span>
+              <span className="text-lg font-bold text-primary">
+                {Object.values(formData.quantidades_por_status).reduce((sum: number, v) => sum + (Number(v) || 0), 0)}
+              </span>
             </div>
           </div>
+
+          {/* Quadro explicativo dos status */}
+          <Card className="bg-muted/30 border-dashed">
+            <CardContent className="pt-4 pb-3">
+              <p className="text-xs font-semibold text-muted-foreground mb-2">📋 Referência de Status:</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li><strong>ITEM NOVO</strong> — Produto novo ou com aspecto de novo</li>
+                <li><strong>ITEM USADO</strong> — Produto usado mas ainda usável</li>
+                <li><strong>ITEM USADO COM AVARIA</strong> — Produto que pode ser aproveitado embora avariado</li>
+                <li><strong>AVARIA/DESCARTE</strong> — Produto disponível para reciclagem</li>
+              </ul>
+            </CardContent>
+          </Card>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
