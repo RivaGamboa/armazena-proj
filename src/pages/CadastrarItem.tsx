@@ -601,45 +601,40 @@ const CadastrarItem = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="status">Status *</Label>
-              <Select 
-                value={formData.status_item}
-                onValueChange={(value) => setFormData({ ...formData, status_item: value })}
-              >
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Selecione um status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((status) => (
-                    <SelectItem key={status} value={status}>{status}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="alocacao">Alocação *</Label>
-              <Select 
-                value={formData.alocacao}
-                onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
-              >
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Selecione uma alocação" />
-                </SelectTrigger>
-                <SelectContent>
-                  {alocacaoOptions.map((aloc) => (
-                    <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div>
+            <Label htmlFor="alocacao">Alocação *</Label>
+            <Select 
+              value={formData.alocacao}
+              onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
+            >
+              <SelectTrigger className="h-12">
+                <SelectValue placeholder="Selecione uma alocação" />
+              </SelectTrigger>
+              <SelectContent>
+                {alocacaoOptions.map((aloc) => (
+                  <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Quantidades por Status */}
           <div className="space-y-3">
             <Label className="text-base font-semibold">Quantidade por Status</Label>
+
+            {/* Quadro explicativo dos status */}
+            <Card className="bg-muted/30 border-dashed">
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs font-semibold text-muted-foreground mb-2">📋 Referência de Status:</p>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li><strong>ITEM NOVO</strong> — Produto novo ou com aspecto de novo</li>
+                  <li><strong>ITEM USADO</strong> — Produto usado mas ainda usável</li>
+                  <li><strong>ITEM USADO COM AVARIA</strong> — Produto que pode ser aproveitado embora avariado</li>
+                  <li><strong>AVARIA/DESCARTE</strong> — Produto disponível para reciclagem</li>
+                </ul>
+              </CardContent>
+            </Card>
+
             <div className="grid grid-cols-2 gap-3">
               {statusOptions.map((status) => (
                 <div key={status}>
@@ -668,19 +663,6 @@ const CadastrarItem = () => {
               </span>
             </div>
           </div>
-
-          {/* Quadro explicativo dos status */}
-          <Card className="bg-muted/30 border-dashed">
-            <CardContent className="pt-4 pb-3">
-              <p className="text-xs font-semibold text-muted-foreground mb-2">📋 Referência de Status:</p>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li><strong>ITEM NOVO</strong> — Produto novo ou com aspecto de novo</li>
-                <li><strong>ITEM USADO</strong> — Produto usado mas ainda usável</li>
-                <li><strong>ITEM USADO COM AVARIA</strong> — Produto que pode ser aproveitado embora avariado</li>
-                <li><strong>AVARIA/DESCARTE</strong> — Produto disponível para reciclagem</li>
-              </ul>
-            </CardContent>
-          </Card>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
