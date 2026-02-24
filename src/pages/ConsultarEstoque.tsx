@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Search, QrCode, MessageSquare, Send, ScanBarcode, Play, CheckSquare, ExternalLink } from "lucide-react";
+import { ArrowLeft, Search, QrCode, ScanBarcode, Play, CheckSquare, ExternalLink, Mic, MicOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
@@ -50,16 +50,16 @@ interface Item {
 const ConsultarEstoque = () => {
   const navigate = useNavigate();
   const [busca, setBusca] = useState("");
-  const [chatMessage, setChatMessage] = useState("");
   const [itens, setItens] = useState<Item[]>([]);
   const [filteredItens, setFilteredItens] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
-  const [chatLoading, setChatLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFiltersState>(initialFilters);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const categorias = Constants.public.Enums.categoria_item_enum;
   const statusList = Constants.public.Enums.status_item_enum;
@@ -213,44 +213,41 @@ const ConsultarEstoque = () => {
     setBusca(code);
   };
 
-  const handleChatSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatMessage.trim()) return;
-
-    setChatLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('chat-estoque', {
-        body: { message: chatMessage }
-      });
-
-      if (error) throw error;
-
-      if (data.filters) {
-        let filtered = [...itens];
-        
-        if (data.filters.categoria) {
-          filtered = filtered.filter(item => item.categoria_item === data.filters.categoria);
-        }
-        if (data.filters.status) {
-          filtered = filtered.filter(item => item.status_item === data.filters.status);
-        }
-        if (data.filters.alocacao) {
-          filtered = filtered.filter(item => item.alocacao === data.filters.alocacao);
-        }
-
-        setFilteredItens(filtered);
-        toast.success(data.message || "Filtros aplicados!");
-      } else {
-        toast.info(data.message || "Nenhum filtro aplicado");
-      }
-
-      setChatMessage("");
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao processar pergunta");
-    } finally {
-      setChatLoading(false);
+  const toggleVoiceSearch = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("Seu navegador não suporta reconhecimento de voz.");
+      return;
     }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setBusca(transcript);
+      handleSearch(transcript);
+      setIsListening(false);
+    };
+
+    recognition.onerror = () => {
+      toast.error("Erro no reconhecimento de voz. Tente novamente.");
+      setIsListening(false);
+    };
+
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+    setIsListening(true);
   };
 
   const toggleItemSelection = (id: number, e: React.MouseEvent) => {
@@ -315,6 +312,16 @@ const ConsultarEstoque = () => {
               <Button
                 type="button"
                 size="icon"
+                variant={isListening ? "destructive" : "outline"}
+                className="h-10 w-10 sm:h-12 sm:w-12 touch-target"
+                onClick={toggleVoiceSearch}
+                title={isListening ? "Parar gravação" : "Buscar por voz"}
+              >
+                {isListening ? <MicOff className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse" /> : <Mic className="h-4 w-4 sm:h-5 sm:w-5" />}
+              </Button>
+              <Button
+                type="button"
+                size="icon"
                 variant="outline"
                 className="h-10 w-10 sm:h-12 sm:w-12 touch-target"
                 onClick={() => setShowScanner(true)}
@@ -332,25 +339,6 @@ const ConsultarEstoque = () => {
               statusList={[...statusList]}
               alocacoes={[...alocacoes]}
             />
-
-            <form onSubmit={handleChatSubmit} className="relative">
-              <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-              <Input
-                placeholder="Pergunte sobre seu estoque..."
-                className="pl-9 sm:pl-10 pr-10 sm:pr-12 h-10 sm:h-12 text-sm sm:text-base"
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-              />
-              <Button 
-                type="submit" 
-                size="icon" 
-                variant="ghost"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                disabled={chatLoading}
-              >
-                <Send className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
-            </form>
           </div>
         </div>
       </div>
