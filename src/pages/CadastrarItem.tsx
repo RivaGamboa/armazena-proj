@@ -664,7 +664,7 @@ const CadastrarItem = () => {
             <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
               <span className="text-sm font-medium">Quantidade Total</span>
               <span className="text-lg font-bold text-primary">
-                {Object.values(formData.quantidades_por_status).reduce((sum, v) => sum + (Number(v) || 0), 0)}
+                {Object.values(formData.quantidades_por_status).reduce((sum: number, v) => sum + (Number(v) || 0), 0)}
               </span>
             </div>
           </div>
