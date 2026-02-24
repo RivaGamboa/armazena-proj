@@ -312,6 +312,16 @@ const ConsultarEstoque = () => {
               <Button
                 type="button"
                 size="icon"
+                variant={isListening ? "destructive" : "outline"}
+                className="h-10 w-10 sm:h-12 sm:w-12 touch-target"
+                onClick={toggleVoiceSearch}
+                title={isListening ? "Parar gravação" : "Buscar por voz"}
+              >
+                {isListening ? <MicOff className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse" /> : <Mic className="h-4 w-4 sm:h-5 sm:w-5" />}
+              </Button>
+              <Button
+                type="button"
+                size="icon"
                 variant="outline"
                 className="h-10 w-10 sm:h-12 sm:w-12 touch-target"
                 onClick={() => setShowScanner(true)}
@@ -329,25 +339,6 @@ const ConsultarEstoque = () => {
               statusList={[...statusList]}
               alocacoes={[...alocacoes]}
             />
-
-            <form onSubmit={handleChatSubmit} className="relative">
-              <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-              <Input
-                placeholder="Pergunte sobre seu estoque..."
-                className="pl-9 sm:pl-10 pr-10 sm:pr-12 h-10 sm:h-12 text-sm sm:text-base"
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-              />
-              <Button 
-                type="submit" 
-                size="icon" 
-                variant="ghost"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                disabled={chatLoading}
-              >
-                <Send className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
-            </form>
           </div>
         </div>
       </div>
