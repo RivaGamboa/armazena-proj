@@ -40,7 +40,7 @@ interface Item {
   quantidade_usado: number;
   quantidade_danificado: number;
   quantidade_total: number | null;
-  quantidades_por_status: Record<string, number> | null;
+  quantidades_por_status: Record<string, number> | null | any;
   comprimento_cm: number | null;
   largura_cm: number | null;
   profundidade_cm: number | null;
