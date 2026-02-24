@@ -57,6 +57,8 @@ const CadastrarItem = () => {
   const [savedItem, setSavedItem] = useState<SavedItem | null>(null);
   const { categorias, alocacoes, statusList, loading: enumsLoading } = useCustomEnums();
   
+  const DEFAULT_STATUS_OPTIONS = ['ITEM NOVO', 'ITEM USADO', 'ITEM USADO COM AVARIA', 'AVARIA/DESCARTE'];
+  
   const categoriaOptions = categorias.length > 0 
     ? categorias.map(c => c.nome) 
     : Constants.public.Enums.categoria_item_enum;
@@ -65,7 +67,7 @@ const CadastrarItem = () => {
     : Constants.public.Enums.alocacao_enum;
   const statusOptions = statusList.length > 0 
     ? statusList.map(s => s.nome) 
-    : Constants.public.Enums.status_item_enum;
+    : DEFAULT_STATUS_OPTIONS;
 
   const [formData, setFormData] = useState({
     sku: "",
