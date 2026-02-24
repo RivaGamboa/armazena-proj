@@ -21,6 +21,27 @@ const DevolverItem = () => {
   const [selectedItem, setSelectedItem] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [showScanner, setShowScanner] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const toggleVoiceSearch = () => {
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) { toast.error("Seu navegador não suporta reconhecimento de voz"); return; }
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;
+    recognition.onresult = (event: any) => { setSearchTerm(event.results[0][0].transcript); setIsListening(false); };
+    recognition.onerror = () => { setIsListening(false); };
+    recognition.onend = () => { setIsListening(false); };
+    recognition.start();
+    setIsListening(true);
+  };
 
   const selectedItemData = itens.find(i => i.id_item.toString() === selectedItem);
 
