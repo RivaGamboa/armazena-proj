@@ -143,14 +143,18 @@ const ConsultarEstoque = () => {
     if (filters.quantidadeMin) {
       const min = parseInt(filters.quantidadeMin);
       filtered = filtered.filter(item => {
-        const total = item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
+        const total = item.quantidades_por_status
+          ? Object.values(item.quantidades_por_status).reduce((s, v) => s + (v || 0), 0)
+          : item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
         return total >= min;
       });
     }
     if (filters.quantidadeMax) {
       const max = parseInt(filters.quantidadeMax);
       filtered = filtered.filter(item => {
-        const total = item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
+        const total = item.quantidades_por_status
+          ? Object.values(item.quantidades_por_status).reduce((s, v) => s + (v || 0), 0)
+          : item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
         return total <= max;
       });
     }
