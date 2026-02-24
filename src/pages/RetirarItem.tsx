@@ -41,7 +41,16 @@ const RetirarItem = () => {
     recognition.lang = 'pt-BR';
     recognition.continuous = false;
     recognition.onresult = (event: any) => { setSearchTerm(event.results[0][0].transcript); setIsListening(false); };
-    recognition.onerror = () => { setIsListening(false); };
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      if (event.error === 'not-allowed') {
+        toast.error("Permissão do microfone negada. Verifique as configurações do navegador.");
+      } else if (event.error === 'no-speech') {
+        toast.info("Nenhuma fala detectada. Tente novamente.");
+      } else {
+        toast.error(`Erro no reconhecimento de voz: ${event.error}`);
+      }
+    };
     recognition.onend = () => { setIsListening(false); };
     recognition.start();
     setIsListening(true);

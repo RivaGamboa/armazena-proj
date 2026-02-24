@@ -145,9 +145,15 @@ const CadastrarItem = () => {
       setListening(false);
     };
 
-    recognition.onerror = () => {
-      toast.error("Erro no reconhecimento de voz. Tente novamente.");
+    recognition.onerror = (event: any) => {
       setListening(false);
+      if (event.error === 'not-allowed') {
+        toast.error("Permissão do microfone negada. Verifique as configurações do navegador.");
+      } else if (event.error === 'no-speech') {
+        toast.info("Nenhuma fala detectada. Tente novamente.");
+      } else {
+        toast.error(`Erro no reconhecimento de voz: ${event.error}`);
+      }
     };
 
     recognition.onend = () => setListening(false);
