@@ -171,6 +171,7 @@ export type Database = {
           quantidade_novo: number
           quantidade_total: number | null
           quantidade_usado: number
+          quantidades_por_status: Json | null
           sku: string | null
           status_item: string
           sync_status: string | null
@@ -197,6 +198,7 @@ export type Database = {
           quantidade_novo?: number
           quantidade_total?: number | null
           quantidade_usado?: number
+          quantidades_por_status?: Json | null
           sku?: string | null
           status_item?: string
           sync_status?: string | null
@@ -223,6 +225,7 @@ export type Database = {
           quantidade_novo?: number
           quantidade_total?: number | null
           quantidade_usado?: number
+          quantidades_por_status?: Json | null
           sku?: string | null
           status_item?: string
           sync_status?: string | null
