@@ -356,15 +356,24 @@ const CadastrarItem = () => {
         ? JSON.stringify(allImageUrls)
         : allImageUrls[0] || null;
 
+      // Build clean quantidades_por_status with numeric values
+      const cleanQuantidades: Record<string, number> = {};
+      for (const [key, val] of Object.entries(formData.quantidades_por_status)) {
+        cleanQuantidades[key] = Number(val) || 0;
+      }
+      const totalQty = Object.values(cleanQuantidades).reduce((sum, v) => sum + v, 0);
+
       const itemData = {
         nome_item: formData.nome_item,
         categoria_item: formData.categoria_item as any,
         descricao_item: formData.descricao_item,
         status_item: formData.status_item as any,
         alocacao: formData.alocacao as any,
-        quantidade_novo: Number(formData.quantidade_novo) || 0,
-        quantidade_usado: Number(formData.quantidade_usado) || 0,
-        quantidade_danificado: Number(formData.quantidade_danificado) || 0,
+        quantidade_novo: cleanQuantidades[statusOptions[0]] || 0,
+        quantidade_usado: cleanQuantidades[statusOptions[1]] || 0,
+        quantidade_danificado: cleanQuantidades[statusOptions[2]] || 0,
+        quantidade_em_manutencao: cleanQuantidades[statusOptions[3]] || 0,
+        quantidades_por_status: cleanQuantidades,
         comprimento_cm: Number(formData.comprimento_cm) || 0,
         largura_cm: Number(formData.largura_cm) || 0,
         profundidade_cm: Number(formData.profundidade_cm) || 0,
