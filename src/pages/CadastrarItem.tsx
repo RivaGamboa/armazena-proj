@@ -267,6 +267,7 @@ const CadastrarItem = () => {
       }
 
       if (data) {
+        const qps = (data as any).quantidades_por_status || {};
         setFormData({
           sku: data.sku || "",
           nome_item: data.nome_item,
@@ -274,9 +275,7 @@ const CadastrarItem = () => {
           descricao_item: data.descricao_item || "",
           status_item: data.status_item,
           alocacao: data.alocacao,
-          quantidade_novo: data.quantidade_novo,
-          quantidade_usado: data.quantidade_usado,
-          quantidade_danificado: data.quantidade_danificado,
+          quantidades_por_status: qps,
           comprimento_cm: data.comprimento_cm || 0,
           largura_cm: data.largura_cm || 0,
           profundidade_cm: data.profundidade_cm || 0,
