@@ -213,44 +213,41 @@ const ConsultarEstoque = () => {
     setBusca(code);
   };
 
-  const handleChatSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatMessage.trim()) return;
-
-    setChatLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('chat-estoque', {
-        body: { message: chatMessage }
-      });
-
-      if (error) throw error;
-
-      if (data.filters) {
-        let filtered = [...itens];
-        
-        if (data.filters.categoria) {
-          filtered = filtered.filter(item => item.categoria_item === data.filters.categoria);
-        }
-        if (data.filters.status) {
-          filtered = filtered.filter(item => item.status_item === data.filters.status);
-        }
-        if (data.filters.alocacao) {
-          filtered = filtered.filter(item => item.alocacao === data.filters.alocacao);
-        }
-
-        setFilteredItens(filtered);
-        toast.success(data.message || "Filtros aplicados!");
-      } else {
-        toast.info(data.message || "Nenhum filtro aplicado");
-      }
-
-      setChatMessage("");
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao processar pergunta");
-    } finally {
-      setChatLoading(false);
+  const toggleVoiceSearch = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("Seu navegador não suporta reconhecimento de voz.");
+      return;
     }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setBusca(transcript);
+      handleSearch(transcript);
+      setIsListening(false);
+    };
+
+    recognition.onerror = () => {
+      toast.error("Erro no reconhecimento de voz. Tente novamente.");
+      setIsListening(false);
+    };
+
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+    setIsListening(true);
   };
 
   const toggleItemSelection = (id: number, e: React.MouseEvent) => {
