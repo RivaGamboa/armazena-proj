@@ -40,6 +40,7 @@ interface Item {
   quantidade_usado: number;
   quantidade_danificado: number;
   quantidade_total: number | null;
+  quantidades_por_status: Record<string, number> | null | any;
   comprimento_cm: number | null;
   largura_cm: number | null;
   profundidade_cm: number | null;
@@ -142,14 +143,20 @@ const ConsultarEstoque = () => {
     if (filters.quantidadeMin) {
       const min = parseInt(filters.quantidadeMin);
       filtered = filtered.filter(item => {
-        const total = item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
+        const qps = item.quantidades_por_status as Record<string, number> | null;
+        const total = qps
+          ? Object.values(qps).reduce((s: number, v: number) => s + (v || 0), 0)
+          : item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
         return total >= min;
       });
     }
     if (filters.quantidadeMax) {
       const max = parseInt(filters.quantidadeMax);
       filtered = filtered.filter(item => {
-        const total = item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
+        const qps = item.quantidades_por_status as Record<string, number> | null;
+        const total = qps
+          ? Object.values(qps).reduce((s: number, v: number) => s + (v || 0), 0)
+          : item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado);
         return total <= max;
       });
     }
@@ -449,7 +456,16 @@ const ConsultarEstoque = () => {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
-                      N: {item.quantidade_novo} | U: {item.quantidade_usado} | D: {item.quantidade_danificado}
+                      {(() => {
+                        const qps = item.quantidades_por_status as Record<string, number> | null;
+                        if (qps) {
+                          const entries = Object.entries(qps).filter(([_, v]) => (v as number) > 0);
+                          return entries.length > 0
+                            ? entries.map(([status, qty]) => `${status}: ${qty}`).join(' | ')
+                            : 'Sem estoque';
+                        }
+                        return `N: ${item.quantidade_novo} | U: ${item.quantidade_usado} | D: ${item.quantidade_danificado}`;
+                      })()}
                     </p>
                   </div>
                 </div>
