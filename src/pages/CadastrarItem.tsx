@@ -405,7 +405,7 @@ const CadastrarItem = () => {
           .single();
 
         if (error) throw error;
-        savedItemData = data;
+        savedItemData = data as any;
         toast.success("Item cadastrado com sucesso!");
       }
 
