@@ -454,7 +454,13 @@ const ConsultarEstoque = () => {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
-                      N: {item.quantidade_novo} | U: {item.quantidade_usado} | D: {item.quantidade_danificado}
+                      {item.quantidades_por_status
+                        ? Object.entries(item.quantidades_por_status)
+                            .filter(([_, v]) => v > 0)
+                            .map(([status, qty]) => `${status}: ${qty}`)
+                            .join(' | ') || 'Sem estoque'
+                        : `N: ${item.quantidade_novo} | U: ${item.quantidade_usado} | D: ${item.quantidade_danificado}`
+                      }
                     </p>
                   </div>
                 </div>
