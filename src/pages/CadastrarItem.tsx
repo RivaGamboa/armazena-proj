@@ -415,9 +415,7 @@ const CadastrarItem = () => {
         categoria_item: savedItemData.categoria_item,
         status_item: savedItemData.status_item,
         alocacao: savedItemData.alocacao,
-        quantidade_novo: savedItemData.quantidade_novo,
-        quantidade_usado: savedItemData.quantidade_usado,
-        quantidade_danificado: savedItemData.quantidade_danificado,
+        quantidades_por_status: cleanQuantidades,
         imagem_item: imagemValue,
         video_item: videoUrl,
       });
