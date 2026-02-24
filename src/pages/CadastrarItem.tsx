@@ -395,7 +395,7 @@ const CadastrarItem = () => {
           .single();
 
         if (error) throw error;
-        savedItemData = data;
+        savedItemData = data as any;
         toast.success("Item atualizado com sucesso!");
       } else {
         const { data, error } = await supabase
