@@ -295,7 +295,7 @@ const RetirarItem = () => {
                                 if (Array.isArray(parsed) && parsed.length > 0) imgUrl = parsed[0];
                               } catch {}
                               return (
-                                <img
+                                <ImageZoom
                                   src={imgUrl}
                                   alt={item.nome_item}
                                   className="w-20 h-20 object-cover rounded-lg border"

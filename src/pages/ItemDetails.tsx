@@ -426,13 +426,13 @@ const ItemDetails = () => {
                      const imgs = parseImageUrls(item.imagem_item);
                      return imgs.length > 0 ? (
                        <div className="grid grid-cols-2 gap-3">
-                         {imgs.map((url, i) => (
-                           <div key={i} className="relative rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
-                             <img
-                               src={url}
-                               alt={`${item.nome_item} - Foto ${i + 1}`}
-                               className="absolute inset-0 w-full h-full object-cover"
-                             />
+                          {imgs.map((url, i) => (
+                            <div key={i} className="relative rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
+                              <ImageZoom
+                                src={url}
+                                alt={`${item.nome_item} - Foto ${i + 1}`}
+                                className="absolute inset-0 w-full h-full object-cover"
+                              />
                            </div>
                          ))}
                        </div>
