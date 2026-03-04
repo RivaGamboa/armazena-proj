@@ -285,14 +285,23 @@ const RetirarItem = () => {
                         </p>
 
                         {/* Preview */}
-                        {isSelected && (item.imagem_item || item.video_item) && (
-                          <div className="mt-2">
-                            <ItemPreview
-                              sku={item.sku}
-                              imagemUrl={item.imagem_item}
-                              videoUrl={item.video_item}
-                              compact
-                            />
+                        {isSelected && (
+                          <div className="mt-2 flex gap-3 flex-wrap">
+                            {item.imagem_item && (
+                              <img
+                                src={item.imagem_item}
+                                alt={item.nome_item}
+                                className="w-20 h-20 object-cover rounded-lg border"
+                              />
+                            )}
+                            {item.video_item && (
+                              <div className="w-20 h-20 relative rounded-lg border overflow-hidden bg-muted">
+                                <video src={item.video_item} className="w-full h-full object-cover" muted preload="metadata" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                  <span className="text-white text-xs">▶</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
 
