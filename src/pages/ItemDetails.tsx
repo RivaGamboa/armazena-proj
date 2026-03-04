@@ -33,6 +33,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ImageZoom } from "@/components/ImageZoom";
 import { MovementTimeline } from "@/components/MovementTimeline";
 import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
