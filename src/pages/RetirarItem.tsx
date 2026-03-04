@@ -89,12 +89,24 @@ const RetirarItem = () => {
       return;
     }
     
+    const term = searchTerm.toLowerCase().trim();
     const filtered = itens.filter(item =>
-      item.nome_item.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.id_item.toString().includes(searchTerm)
+      item.nome_item.toLowerCase().includes(term) ||
+      item.sku?.toLowerCase().includes(term) ||
+      item.id_item.toString().includes(term)
     );
     setFilteredItens(filtered);
+    
+    // Auto-selecionar se houver exatamente 1 resultado
+    if (filtered.length === 1) {
+      setSelectedItem(filtered[0].id_item.toString());
+    } else if (filtered.length > 1) {
+      // Verificar correspondência exata pelo nome
+      const exact = filtered.find(item => item.nome_item.toLowerCase() === term);
+      if (exact) {
+        setSelectedItem(exact.id_item.toString());
+      }
+    }
   }, [searchTerm, itens]);
 
   const handleScanResult = (code: string) => {
