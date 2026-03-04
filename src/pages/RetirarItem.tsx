@@ -437,7 +437,7 @@ const RetirarItem = () => {
                 const skuLabel = item?.sku ? ` SKU ${item.sku}` : "";
                 return `${totalQty > 0 ? totalQty : "?"} un. de ${item?.nome_item || "?"}${skuLabel}${statusParts ? ` (${statusParts})` : ""}`;
               });
-              return `Confirmar Retirada de ${parts.join(" + ")}`;
+              return `Confirmar Retirada de ${parts.join(" + ")} → ${destino || "?"}`;
             })()}
           </Button>
         </form>
