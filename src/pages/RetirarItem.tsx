@@ -30,6 +30,8 @@ const RetirarItem = () => {
   const [observacoes, setObservacoes] = useState("");
   const [showScanner, setShowScanner] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [novoDestino, setNovoDestino] = useState("");
+  const [showNovoDestino, setShowNovoDestino] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { alocacoes, statusList } = useCustomEnums();
 
