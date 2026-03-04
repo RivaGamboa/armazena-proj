@@ -171,7 +171,7 @@ const RetirarItem = () => {
 
         const { error: updateError } = await supabase
           .from('itens_em_estoque')
-          .update({ alocacao: destino as any })
+          .update({ alocacao_atual: destino } as any)
           .eq('id_item', idItem);
 
         if (updateError) throw updateError;
