@@ -287,13 +287,20 @@ const RetirarItem = () => {
                         {/* Preview */}
                         {isSelected && (
                           <div className="mt-2 flex gap-3 flex-wrap">
-                            {item.imagem_item && (
-                              <img
-                                src={item.imagem_item}
-                                alt={item.nome_item}
-                                className="w-20 h-20 object-cover rounded-lg border"
-                              />
-                            )}
+                            {item.imagem_item && (() => {
+                              let imgUrl = item.imagem_item;
+                              try {
+                                const parsed = JSON.parse(imgUrl);
+                                if (Array.isArray(parsed) && parsed.length > 0) imgUrl = parsed[0];
+                              } catch {}
+                              return (
+                                <img
+                                  src={imgUrl}
+                                  alt={item.nome_item}
+                                  className="w-20 h-20 object-cover rounded-lg border"
+                                />
+                              );
+                            })()}
                             {item.video_item && (
                               <div className="w-20 h-20 relative rounded-lg border overflow-hidden bg-muted">
                                 <video src={item.video_item} className="w-full h-full object-cover" muted preload="metadata" />
