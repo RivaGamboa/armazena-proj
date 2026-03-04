@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Tag } from "lucide-react";
+import { Plus, Pencil, Trash2, Tag, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { CustomEnumItem } from "@/hooks/useCustomEnums";
@@ -16,6 +16,7 @@ interface EnumManagerProps {
   itemCounts: { [key: string]: number };
   onRefresh: () => void;
   showColor?: boolean;
+  showDefault?: boolean;
 }
 
 export const EnumManager = ({ 
@@ -24,7 +25,8 @@ export const EnumManager = ({
   items, 
   itemCounts,
   onRefresh,
-  showColor = false 
+  showColor = false,
+  showDefault = false,
 }: EnumManagerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CustomEnumItem | null>(null);
@@ -68,6 +70,31 @@ export const EnumManager = ({
     } catch (error) {
       console.error(error);
       toast.error("Erro ao excluir item");
+    }
+  };
+
+  const handleSetDefault = async (item: CustomEnumItem) => {
+    try {
+      // Clear all defaults first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Não autenticado");
+      
+      await supabase
+        .from("alocacoes")
+        .update({ is_default: false } as any)
+        .eq("user_id", user.id);
+      
+      // Set this one as default
+      await supabase
+        .from("alocacoes")
+        .update({ is_default: true } as any)
+        .eq("id", item.id);
+      
+      toast.success(`"${item.nome}" definido como alocação padrão!`);
+      onRefresh();
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao definir padrão");
     }
   };
 
@@ -196,6 +223,11 @@ export const EnumManager = ({
         </Dialog>
       </CardHeader>
       <CardContent className="pt-4">
+        {showDefault && (
+          <p className="text-xs text-muted-foreground mb-3">
+            ⭐ Clique na estrela para definir a alocação padrão (onde os itens devem ficar por padrão).
+          </p>
+        )}
         <div className="space-y-2">
           {items.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
@@ -207,7 +239,7 @@ export const EnumManager = ({
             items.map((item) => (
               <div 
                 key={item.id} 
-                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg group hover:bg-muted transition-colors border border-transparent hover:border-border"
+                className={`flex items-center justify-between p-3 rounded-lg group hover:bg-muted transition-colors border ${item.is_default ? 'bg-primary/5 border-primary/30' : 'bg-muted/50 border-transparent hover:border-border'}`}
               >
                 <div className="flex items-center gap-3">
                   {showColor && (
@@ -218,6 +250,9 @@ export const EnumManager = ({
                   )}
                   <div>
                     <span className="font-medium">{item.nome}</span>
+                    {item.is_default && (
+                      <span className="ml-2 text-xs text-primary font-semibold">PADRÃO</span>
+                    )}
                     {item.descricao && (
                       <p className="text-xs text-muted-foreground">{item.descricao}</p>
                     )}
@@ -228,6 +263,17 @@ export const EnumManager = ({
                     {itemCounts[item.nome] || 0} itens
                   </span>
                   <div className="flex gap-1">
+                    {showDefault && (
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className={`h-8 w-8 ${item.is_default ? 'text-primary' : 'text-muted-foreground'}`}
+                        onClick={() => handleSetDefault(item)}
+                        title="Definir como padrão"
+                      >
+                        <Star className={`h-4 w-4 ${item.is_default ? 'fill-primary' : ''}`} />
+                      </Button>
+                    )}
                     <Button 
                       size="icon" 
                       variant="ghost" 
