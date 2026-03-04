@@ -33,6 +33,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ImageZoom } from "@/components/ImageZoom";
 import { MovementTimeline } from "@/components/MovementTimeline";
 import QRCodeSVG from "react-qr-code";
 import Barcode from "react-barcode";
@@ -249,7 +250,7 @@ const ItemDetails = () => {
                   <div className="w-full sm:w-1/2 flex flex-col items-center">
                     <span className="text-xs text-muted-foreground block mb-2">Destaque</span>
                     <div className="relative w-full rounded-lg overflow-hidden border bg-muted" style={{ aspectRatio: '1/1' }}>
-                      <img
+                      <ImageZoom
                         src={imgs[0]}
                         alt={item.nome_item}
                         className="absolute inset-0 w-full h-full object-cover"
@@ -425,13 +426,13 @@ const ItemDetails = () => {
                      const imgs = parseImageUrls(item.imagem_item);
                      return imgs.length > 0 ? (
                        <div className="grid grid-cols-2 gap-3">
-                         {imgs.map((url, i) => (
-                           <div key={i} className="relative rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
-                             <img
-                               src={url}
-                               alt={`${item.nome_item} - Foto ${i + 1}`}
-                               className="absolute inset-0 w-full h-full object-cover"
-                             />
+                          {imgs.map((url, i) => (
+                            <div key={i} className="relative rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
+                              <ImageZoom
+                                src={url}
+                                alt={`${item.nome_item} - Foto ${i + 1}`}
+                                className="absolute inset-0 w-full h-full object-cover"
+                              />
                            </div>
                          ))}
                        </div>

@@ -337,6 +337,7 @@ const Dashboard = () => {
                     items={alocacoes}
                     itemCounts={itemCounts.alocacoes}
                     onRefresh={refetch}
+                    showDefault
                   />
                 </TabsContent>
 

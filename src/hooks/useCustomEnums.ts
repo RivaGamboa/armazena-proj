@@ -7,6 +7,7 @@ export interface CustomEnumItem {
   descricao?: string;
   ativo: boolean;
   cor?: string;
+  is_default?: boolean;
 }
 
 export const useCustomEnums = () => {
@@ -24,7 +25,7 @@ export const useCustomEnums = () => {
       ]);
 
       if (catRes.data) setCategorias(catRes.data);
-      if (alocRes.data) setAlocacoes(alocRes.data);
+      if (alocRes.data) setAlocacoes(alocRes.data.map((a: any) => ({ ...a, is_default: a.is_default ?? false })));
       if (statusRes.data) setStatusList(statusRes.data);
     } catch (error) {
       console.error("Erro ao carregar enums:", error);
@@ -33,9 +34,14 @@ export const useCustomEnums = () => {
     }
   };
 
+  const getDefaultAlocacao = (): string | null => {
+    const def = alocacoes.find(a => a.is_default);
+    return def?.nome ?? null;
+  };
+
   useEffect(() => {
     loadEnums();
   }, []);
 
-  return { categorias, alocacoes, statusList, loading, refetch: loadEnums };
+  return { categorias, alocacoes, statusList, loading, refetch: loadEnums, getDefaultAlocacao };
 };

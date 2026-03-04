@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           descricao: string | null
           id: string
+          is_default: boolean
           nome: string
           user_id: string
         }
@@ -28,6 +29,7 @@ export type Database = {
           created_at?: string
           descricao?: string | null
           id?: string
+          is_default?: boolean
           nome: string
           user_id: string
         }
@@ -36,6 +38,7 @@ export type Database = {
           created_at?: string
           descricao?: string | null
           id?: string
+          is_default?: boolean
           nome?: string
           user_id?: string
         }
@@ -154,6 +157,7 @@ export type Database = {
       itens_em_estoque: {
         Row: {
           alocacao: string
+          alocacao_atual: string | null
           categoria_item: string
           comprimento_cm: number | null
           data_cadastro: string
@@ -181,6 +185,7 @@ export type Database = {
         }
         Insert: {
           alocacao?: string
+          alocacao_atual?: string | null
           categoria_item: string
           comprimento_cm?: number | null
           data_cadastro?: string
@@ -208,6 +213,7 @@ export type Database = {
         }
         Update: {
           alocacao?: string
+          alocacao_atual?: string | null
           categoria_item?: string
           comprimento_cm?: number | null
           data_cadastro?: string

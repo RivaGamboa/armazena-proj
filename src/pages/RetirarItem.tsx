@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { ItemPreview } from "@/components/ItemPreview";
+import { ImageZoom } from "@/components/ImageZoom";
 import { useCustomEnums } from "@/hooks/useCustomEnums";
 
 interface SelectedItemQty {
@@ -171,7 +172,7 @@ const RetirarItem = () => {
 
         const { error: updateError } = await supabase
           .from('itens_em_estoque')
-          .update({ alocacao: destino as any })
+          .update({ alocacao_atual: destino } as any)
           .eq('id_item', idItem);
 
         if (updateError) throw updateError;
@@ -294,7 +295,7 @@ const RetirarItem = () => {
                                 if (Array.isArray(parsed) && parsed.length > 0) imgUrl = parsed[0];
                               } catch {}
                               return (
-                                <img
+                                <ImageZoom
                                   src={imgUrl}
                                   alt={item.nome_item}
                                   className="w-20 h-20 object-cover rounded-lg border"

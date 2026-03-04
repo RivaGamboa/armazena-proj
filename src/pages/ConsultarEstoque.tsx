@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Search, QrCode, ScanBarcode, Play, CheckSquare, ExternalLink, Mic, MicOff } from "lucide-react";
+import { ImageZoom } from "@/components/ImageZoom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
@@ -424,7 +425,7 @@ const ConsultarEstoque = () => {
                   {(() => {
                       const imgs = parseImageUrls(item.imagem_item);
                       return imgs.length > 0 ? (
-                      <img 
+                      <ImageZoom 
                         src={imgs[0]} 
                         alt={item.nome_item}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded"
