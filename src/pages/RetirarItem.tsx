@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Search, ScanBarcode, Mic, MicOff, PackageSearch, AlertCircle } from "lucide-react";
+import { ArrowLeft, Search, ScanBarcode, Mic, MicOff, PackageSearch, AlertCircle, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
