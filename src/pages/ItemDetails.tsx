@@ -241,31 +241,38 @@ const ItemDetails = () => {
         {/* SKU, QR Code e Barcode */}
         {item.sku && (
           <Card className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
+            <div className="flex flex-col sm:flex-row items-center sm:items-stretch gap-4 sm:gap-6">
+              {/* Imagem Destaque - 50% do espaço */}
               {(() => {
                 const imgs = parseImageUrls(item.imagem_item);
                 return imgs.length > 0 ? (
-                  <div className="text-center">
+                  <div className="w-full sm:w-1/2 flex flex-col items-center">
                     <span className="text-xs text-muted-foreground block mb-2">Destaque</span>
-                    <img
-                      src={imgs[0]}
-                      alt={item.nome_item}
-                      className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-lg border"
-                    />
+                    <div className="relative w-full rounded-lg overflow-hidden border bg-muted" style={{ aspectRatio: '1/1' }}>
+                      <img
+                        src={imgs[0]}
+                        alt={item.nome_item}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
                 ) : null;
               })()}
-              <div className="text-center">
-                <span className="text-xs text-muted-foreground block mb-2">SKU</span>
-                <div className="text-3xl sm:text-4xl font-bold font-mono">{item.sku}</div>
-              </div>
-              <div className="text-center">
-                <span className="text-xs text-muted-foreground block mb-2">QR Code</span>
-                <QRCodeSVG value={item.sku} size={100} />
-              </div>
-              <div className="text-center">
-                <span className="text-xs text-muted-foreground block mb-2">Código de Barras</span>
-                <Barcode value={item.sku} height={60} width={1.5} fontSize={12} />
+
+              {/* SKU + QR + Barcode - 50% restante */}
+              <div className="w-full sm:w-1/2 flex flex-col items-center justify-between gap-3">
+                <div className="text-center">
+                  <span className="text-xs text-muted-foreground block mb-1">SKU</span>
+                  <div className="text-2xl sm:text-3xl font-bold font-mono">{item.sku}</div>
+                </div>
+                <div className="text-center">
+                  <span className="text-xs text-muted-foreground block mb-1">QR Code</span>
+                  <QRCodeSVG value={item.sku} size={80} />
+                </div>
+                <div className="text-center overflow-hidden">
+                  <span className="text-xs text-muted-foreground block mb-1">Código de Barras</span>
+                  <Barcode value={item.sku} height={45} width={1.2} fontSize={10} />
+                </div>
               </div>
             </div>
           </Card>
