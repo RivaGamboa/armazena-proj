@@ -115,10 +115,8 @@ const RetirarItem = () => {
   };
 
   const toggleItemSelection = (item: any) => {
-    const newMap = new Map(selectedItems);
-    if (newMap.has(item.id_item)) {
-      newMap.delete(item.id_item);
-    } else {
+    const newMap = new Map<number, SelectedItemQty>();
+    if (!selectedItems.has(item.id_item)) {
       newMap.set(item.id_item, { id_item: item.id_item, quantidades: {} });
     }
     setSelectedItems(newMap);
