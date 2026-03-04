@@ -250,7 +250,7 @@ const ItemDetails = () => {
                   <div className="w-full sm:w-1/2 flex flex-col items-center">
                     <span className="text-xs text-muted-foreground block mb-2">Destaque</span>
                     <div className="relative w-full rounded-lg overflow-hidden border bg-muted" style={{ aspectRatio: '1/1' }}>
-                      <img
+                      <ImageZoom
                         src={imgs[0]}
                         alt={item.nome_item}
                         className="absolute inset-0 w-full h-full object-cover"
