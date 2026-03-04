@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Search, ScanBarcode, Mic, MicOff, PackageSearch, AlertCircle } from "lucide-react";
+import { ArrowLeft, Search, ScanBarcode, Mic, MicOff, PackageSearch, AlertCircle, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
@@ -30,6 +30,8 @@ const RetirarItem = () => {
   const [observacoes, setObservacoes] = useState("");
   const [showScanner, setShowScanner] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [novoDestino, setNovoDestino] = useState("");
+  const [showNovoDestino, setShowNovoDestino] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { alocacoes, statusList } = useCustomEnums();
 
@@ -63,11 +65,7 @@ const RetirarItem = () => {
 
   const destinoOptions = alocacoes.filter(a => a.nome !== "DEPOSITO");
 
-  useEffect(() => {
-    if (destinoOptions.length > 0 && !destino) {
-      setDestino(destinoOptions[0].nome);
-    }
-  }, [destinoOptions]);
+  // No default - start blank
 
   useEffect(() => {
     loadItens();
@@ -345,16 +343,66 @@ const RetirarItem = () => {
           {/* Destino */}
           <div>
             <Label htmlFor="destino">Destino *</Label>
-            <Select value={destino} onValueChange={setDestino}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o destino" />
-              </SelectTrigger>
-              <SelectContent>
-                {destinoOptions.map((aloc) => (
-                  <SelectItem key={aloc.id} value={aloc.nome}>{aloc.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={destino} onValueChange={(val) => { setDestino(val); setShowNovoDestino(false); }}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Informe destino" />
+                </SelectTrigger>
+                <SelectContent>
+                  {destinoOptions.map((aloc) => (
+                    <SelectItem key={aloc.id} value={aloc.nome}>{aloc.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                onClick={() => setShowNovoDestino(!showNovoDestino)}
+                title="Cadastrar novo destino"
+              >
+                <Plus className="h-5 w-5" />
+              </Button>
+            </div>
+            {showNovoDestino && (
+              <div className="flex gap-2 mt-2">
+                <Input
+                  placeholder="Nome do novo destino"
+                  value={novoDestino}
+                  onChange={(e) => setNovoDestino(e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={!novoDestino.trim()}
+                  onClick={async () => {
+                    const nome = novoDestino.trim().toUpperCase();
+                    if (!nome) return;
+                    const exists = alocacoes.some(a => a.nome.toUpperCase() === nome);
+                    if (exists) {
+                      toast.error("Destino já existe");
+                      return;
+                    }
+                    try {
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (!user) throw new Error("Não autenticado");
+                      const { error } = await supabase.from('alocacoes').insert({ nome, user_id: user.id });
+                      if (error) throw error;
+                      toast.success(`Destino "${nome}" cadastrado!`);
+                      setDestino(nome);
+                      setNovoDestino("");
+                      setShowNovoDestino(false);
+                    } catch (err) {
+                      console.error(err);
+                      toast.error("Erro ao cadastrar destino");
+                    }
+                  }}
+                >
+                  Salvar
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Observações */}
@@ -368,8 +416,22 @@ const RetirarItem = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full h-14 text-lg" disabled={loading || selectedItems.size === 0}>
-            {loading ? "Processando..." : `Confirmar Retirada (${selectedItems.size} item${selectedItems.size !== 1 ? 's' : ''})`}
+          <Button type="submit" className="w-full h-auto min-h-14 text-base py-3 whitespace-normal" disabled={loading || selectedItems.size === 0 || !destino}>
+            {loading ? "Processando..." : (() => {
+              const entries = Array.from(selectedItems.entries());
+              if (entries.length === 0) return "Selecione itens para retirada";
+              const parts = entries.map(([idItem, sel]) => {
+                const item = itens.find(i => i.id_item === idItem);
+                const totalQty = Object.values(sel.quantidades).reduce((s, v) => s + v, 0);
+                const statusParts = Object.entries(sel.quantidades)
+                  .filter(([, v]) => v > 0)
+                  .map(([st, v]) => `${v} ${st}`)
+                  .join(", ");
+                const skuLabel = item?.sku ? ` SKU ${item.sku}` : "";
+                return `${totalQty > 0 ? totalQty : "?"} un. de ${item?.nome_item || "?"}${skuLabel}${statusParts ? ` (${statusParts})` : ""}`;
+              });
+              return `Confirmar Retirada de ${parts.join(" + ")}`;
+            })()}
           </Button>
         </form>
 
