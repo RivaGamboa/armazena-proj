@@ -77,7 +77,6 @@ const RetirarItem = () => {
     const { data } = await supabase
       .from('itens_em_estoque')
       .select('*')
-      .eq('alocacao', 'DEPOSITO')
       .order('nome_item');
     setItens(data || []);
   };
