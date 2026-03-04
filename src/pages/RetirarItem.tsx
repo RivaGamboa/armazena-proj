@@ -65,11 +65,7 @@ const RetirarItem = () => {
 
   const destinoOptions = alocacoes.filter(a => a.nome !== "DEPOSITO");
 
-  useEffect(() => {
-    if (destinoOptions.length > 0 && !destino) {
-      setDestino(destinoOptions[0].nome);
-    }
-  }, [destinoOptions]);
+  // No default - start blank
 
   useEffect(() => {
     loadItens();
