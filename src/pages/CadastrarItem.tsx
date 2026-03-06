@@ -674,19 +674,24 @@ const CadastrarItem = () => {
 
           <div>
             <Label htmlFor="alocacao">Alocação *</Label>
-            <Select 
-              value={formData.alocacao}
-              onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
-            >
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="Selecione uma alocação" />
-              </SelectTrigger>
-              <SelectContent>
-                {alocacaoOptions.map((aloc) => (
-                  <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select 
+                value={formData.alocacao}
+                onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
+              >
+                <SelectTrigger className="h-12 flex-1">
+                  <SelectValue placeholder="Selecione uma alocação" />
+                </SelectTrigger>
+                <SelectContent>
+                  {alocacaoOptions.map((aloc) => (
+                    <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="button" variant="outline" size="icon" className="h-12 w-12 shrink-0" onClick={() => setShowAddAlocacao(true)} title="Nova alocação">
+                <Plus className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Quantidades por Status */}
