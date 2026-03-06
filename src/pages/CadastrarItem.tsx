@@ -20,6 +20,9 @@ import { useCustomEnums } from "@/hooks/useCustomEnums";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Constants } from "@/integrations/supabase/types";
 
+// Remove the unused import since we use dynamic enums
+
+
 const MAX_PHOTOS = 4;
 
 interface SavedItem {
