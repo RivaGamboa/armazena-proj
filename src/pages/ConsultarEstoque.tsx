@@ -548,6 +548,26 @@ const ConsultarEstoque = () => {
                       </div>
                     </div>
 
+                    {/* Galeria de Imagens */}
+                    {(() => {
+                      const imgs = parseImageUrls(item.imagem_item);
+                      return (imgs.length > 0 || item.video_item) ? (
+                        <div className="pt-3 border-t">
+                          <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
+                            <Images className="h-3.5 w-3.5" />
+                            Galeria ({imgs.length} foto{imgs.length !== 1 ? 's' : ''}{item.video_item ? ' • 1 vídeo' : ''})
+                          </h4>
+                          <div className="grid grid-cols-4 gap-1.5">
+                            {imgs.map((url, i) => (
+                              <div key={i} className="relative rounded overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
+                                <ImageZoom src={url} alt={`${item.nome_item} ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null;
+                    })()}
+
                     {/* Timeline de Movimentações - Preview */}
                     <div className="pt-3 border-t">
                       <MovementTimeline itemId={item.id_item} />
