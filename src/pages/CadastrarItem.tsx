@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus, Mic, MicOff, Star } from "lucide-react";
+import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus, Mic, MicOff, Star, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import QRCodeSVG from "react-qr-code";
@@ -17,6 +17,7 @@ import { ItemPreview } from "@/components/ItemPreview";
 import { SavedItemPreview } from "@/components/SavedItemPreview";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useCustomEnums } from "@/hooks/useCustomEnums";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Constants } from "@/integrations/supabase/types";
 
 const MAX_PHOTOS = 4;
