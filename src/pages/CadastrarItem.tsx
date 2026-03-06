@@ -636,8 +636,8 @@ const CadastrarItem = () => {
                   <SelectValue placeholder="Escolha na lista ou crie novo" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categoriaOptions.map((cat) => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                   {categoriaOptions.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat.toUpperCase()}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
