@@ -58,7 +58,7 @@ const CadastrarItem = () => {
   const [showLabelGenerator, setShowLabelGenerator] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [savedItem, setSavedItem] = useState<SavedItem | null>(null);
-  const { categorias, alocacoes, statusList, loading: enumsLoading } = useCustomEnums();
+  const { categorias, alocacoes, statusList, loading: enumsLoading, refetch } = useCustomEnums();
   
   const DEFAULT_STATUS_OPTIONS = ['ITEM NOVO', 'ITEM USADO', 'ITEM USADO COM AVARIA', 'AVARIA/DESCARTE'];
   
@@ -71,6 +71,62 @@ const CadastrarItem = () => {
   const statusOptions = statusList.length > 0 
     ? statusList.map(s => s.nome) 
     : DEFAULT_STATUS_OPTIONS;
+
+  // Inline add dialogs
+  const [showAddCategoria, setShowAddCategoria] = useState(false);
+  const [showAddAlocacao, setShowAddAlocacao] = useState(false);
+  const [newCategoriaName, setNewCategoriaName] = useState("");
+  const [newAlocacaoName, setNewAlocacaoName] = useState("");
+  const [savingEnum, setSavingEnum] = useState(false);
+  const [isListeningCategoria, setIsListeningCategoria] = useState(false);
+  const [isListeningAlocacao, setIsListeningAlocacao] = useState(false);
+  const recognitionCategoriaRef = useRef<any>(null);
+  const recognitionAlocacaoRef = useRef<any>(null);
+
+  const toggleVoiceEnum = (field: 'categoria' | 'alocacao') => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) { toast.error("Navegador não suporta voz."); return; }
+    const isCat = field === 'categoria';
+    const listening = isCat ? isListeningCategoria : isListeningAlocacao;
+    const setListening = isCat ? setIsListeningCategoria : setIsListeningAlocacao;
+    const refObj = isCat ? recognitionCategoriaRef : recognitionAlocacaoRef;
+    const setter = isCat ? setNewCategoriaName : setNewAlocacaoName;
+    if (listening) { refObj.current?.stop(); setListening(false); return; }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR"; recognition.continuous = false; recognition.interimResults = false;
+    refObj.current = recognition;
+    recognition.onresult = (event: any) => {
+      const t = capitalizarTexto(event.results[0][0].transcript);
+      setter(prev => prev ? prev + " " + t : t);
+      setListening(false);
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+    recognition.start(); setListening(true);
+  };
+
+  const handleAddEnum = async (type: 'categoria' | 'alocacao') => {
+    const name = type === 'categoria' ? newCategoriaName.trim() : newAlocacaoName.trim();
+    if (!name) { toast.error("Nome é obrigatório"); return; }
+    setSavingEnum(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Não autenticado");
+      const table = type === 'categoria' ? 'categorias_item' : 'alocacoes';
+      const { error } = await supabase.from(table).insert([{ nome: name, user_id: user.id }]);
+      if (error) throw error;
+      await refetch();
+      setFormData(prev => ({
+        ...prev,
+        ...(type === 'categoria' ? { categoria_item: name } : { alocacao: name }),
+      }));
+      toast.success(`${type === 'categoria' ? 'Categoria' : 'Alocação'} adicionada!`);
+      if (type === 'categoria') { setShowAddCategoria(false); setNewCategoriaName(""); }
+      else { setShowAddAlocacao(false); setNewAlocacaoName(""); }
+    } catch (error: any) {
+      toast.error(error.code === "23505" ? "Já existe com este nome" : "Erro ao salvar");
+    } finally { setSavingEnum(false); }
+  };
 
   const [formData, setFormData] = useState({
     sku: "",
