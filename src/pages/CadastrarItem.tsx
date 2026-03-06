@@ -681,8 +681,8 @@ const CadastrarItem = () => {
                   <SelectValue placeholder="Escolha na lista ou crie novo" />
                 </SelectTrigger>
                 <SelectContent>
-                  {alocacaoOptions.map((aloc) => (
-                    <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
+                   {alocacaoOptions.map((aloc) => (
+                    <SelectItem key={aloc} value={aloc}>{aloc.toUpperCase()}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
