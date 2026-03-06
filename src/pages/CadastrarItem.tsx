@@ -358,10 +358,10 @@ const CadastrarItem = () => {
     setFormData({
       sku: "",
       nome_item: "",
-      categoria_item: categoriaOptions[0] || "Ferramentas",
+      categoria_item: "",
       descricao_item: "",
       status_item: statusOptions[0] || "ITEM NOVO",
-      alocacao: alocacaoOptions[0] || "DEPOSITO",
+      alocacao: "",
       quantidades_por_status: {},
       comprimento_cm: "",
       largura_cm: "",
