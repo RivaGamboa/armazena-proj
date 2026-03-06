@@ -96,7 +96,7 @@ const CadastrarItem = () => {
     recognition.lang = "pt-BR"; recognition.continuous = false; recognition.interimResults = false;
     refObj.current = recognition;
     recognition.onresult = (event: any) => {
-      const t = capitalizarTexto(event.results[0][0].transcript);
+      const t = event.results[0][0].transcript.toUpperCase();
       setter(prev => prev ? prev + " " + t : t);
       setListening(false);
     };
@@ -106,7 +106,7 @@ const CadastrarItem = () => {
   };
 
   const handleAddEnum = async (type: 'categoria' | 'alocacao') => {
-    const name = type === 'categoria' ? newCategoriaName.trim() : newAlocacaoName.trim();
+    const name = (type === 'categoria' ? newCategoriaName.trim() : newAlocacaoName.trim()).toUpperCase();
     if (!name) { toast.error("Nome é obrigatório"); return; }
     setSavingEnum(true);
     try {
@@ -223,11 +223,9 @@ const CadastrarItem = () => {
   };
 
   useEffect(() => {
-    if (!enumsLoading && !isEditMode && !formData.categoria_item) {
+    if (!enumsLoading && !isEditMode && !formData.status_item) {
       setFormData(prev => ({
         ...prev,
-        categoria_item: categoriaOptions[0] || "Ferramentas",
-        alocacao: alocacaoOptions[0] || "DEPOSITO",
         status_item: statusOptions[0] || "ITEM NOVO",
       }));
     }
@@ -360,10 +358,10 @@ const CadastrarItem = () => {
     setFormData({
       sku: "",
       nome_item: "",
-      categoria_item: categoriaOptions[0] || "Ferramentas",
+      categoria_item: "",
       descricao_item: "",
       status_item: statusOptions[0] || "ITEM NOVO",
-      alocacao: alocacaoOptions[0] || "DEPOSITO",
+      alocacao: "",
       quantidades_por_status: {},
       comprimento_cm: "",
       largura_cm: "",
@@ -635,11 +633,11 @@ const CadastrarItem = () => {
                 onValueChange={(value) => setFormData({ ...formData, categoria_item: value })}
               >
                 <SelectTrigger className="h-12 flex-1">
-                  <SelectValue placeholder="Selecione uma categoria" />
+                  <SelectValue placeholder="Escolha na lista ou crie novo" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categoriaOptions.map((cat) => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                   {categoriaOptions.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat.toUpperCase()}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -680,11 +678,11 @@ const CadastrarItem = () => {
                 onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
               >
                 <SelectTrigger className="h-12 flex-1">
-                  <SelectValue placeholder="Selecione uma alocação" />
+                  <SelectValue placeholder="Escolha na lista ou crie novo" />
                 </SelectTrigger>
                 <SelectContent>
-                  {alocacaoOptions.map((aloc) => (
-                    <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
+                   {alocacaoOptions.map((aloc) => (
+                    <SelectItem key={aloc} value={aloc}>{aloc.toUpperCase()}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
