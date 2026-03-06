@@ -629,19 +629,24 @@ const CadastrarItem = () => {
 
           <div>
             <Label htmlFor="categoria">Categoria *</Label>
-            <Select 
-              value={formData.categoria_item}
-              onValueChange={(value) => setFormData({ ...formData, categoria_item: value })}
-            >
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categoriaOptions.map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select 
+                value={formData.categoria_item}
+                onValueChange={(value) => setFormData({ ...formData, categoria_item: value })}
+              >
+                <SelectTrigger className="h-12 flex-1">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categoriaOptions.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="button" variant="outline" size="icon" className="h-12 w-12 shrink-0" onClick={() => setShowAddCategoria(true)} title="Nova categoria">
+                <Plus className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
           <div>
