@@ -223,11 +223,9 @@ const CadastrarItem = () => {
   };
 
   useEffect(() => {
-    if (!enumsLoading && !isEditMode && !formData.categoria_item) {
+    if (!enumsLoading && !isEditMode && !formData.status_item) {
       setFormData(prev => ({
         ...prev,
-        categoria_item: categoriaOptions[0] || "Ferramentas",
-        alocacao: alocacaoOptions[0] || "DEPOSITO",
         status_item: statusOptions[0] || "ITEM NOVO",
       }));
     }
