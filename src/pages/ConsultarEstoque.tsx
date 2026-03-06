@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Search, QrCode, ScanBarcode, Play, CheckSquare, ExternalLink, Mic, MicOff } from "lucide-react";
+import { ArrowLeft, Search, QrCode, ScanBarcode, Play, CheckSquare, ExternalLink, Mic, MicOff, Images } from "lucide-react";
 import { ImageZoom } from "@/components/ImageZoom";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
@@ -420,16 +421,45 @@ const ConsultarEstoque = () => {
                       className="h-5 w-5 mt-1"
                     />
                   )}
-                  {/* Preview de Imagem */}
+                  {/* Preview de Imagem com Hover */}
                   <div className="flex flex-col gap-2">
                   {(() => {
                       const imgs = parseImageUrls(item.imagem_item);
                       return imgs.length > 0 ? (
-                      <ImageZoom 
-                        src={imgs[0]} 
-                        alt={item.nome_item}
-                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded"
-                      />
+                      <HoverCard openDelay={200} closeDelay={100}>
+                        <HoverCardTrigger asChild>
+                          <div className="cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                            <ImageZoom 
+                              src={imgs[0]} 
+                              alt={item.nome_item}
+                              className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded"
+                            />
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent side="right" className="w-72 p-2 space-y-2">
+                          <div className="relative rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
+                            <img src={imgs[0]} alt={item.nome_item} className="w-full h-full object-cover" />
+                          </div>
+                          {imgs.length > 1 && (
+                            <div className="grid grid-cols-3 gap-1">
+                              {imgs.slice(1, 4).map((url, i) => (
+                                <div key={i} className="relative rounded overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
+                                  <img src={url} alt={`${item.nome_item} ${i + 2}`} className="w-full h-full object-cover" />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {item.video_item && (
+                            <div className="relative rounded overflow-hidden bg-muted">
+                              <video src={item.video_item} className="w-full max-h-40 object-cover" muted preload="metadata" />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                <Play className="h-8 w-8 text-white" />
+                              </div>
+                            </div>
+                          )}
+                          <p className="text-xs text-muted-foreground text-center">{imgs.length} foto(s){item.video_item ? ' • 1 vídeo' : ''}</p>
+                        </HoverCardContent>
+                      </HoverCard>
                     ) : (
                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded flex items-center justify-center">
                         <Search className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
@@ -437,17 +467,19 @@ const ConsultarEstoque = () => {
                     );
                     })()}
                     {item.video_item && (
-                      <div className="w-16 h-10 sm:w-20 sm:h-14 relative rounded overflow-hidden bg-muted">
-                        <video
-                          src={item.video_item}
-                          className="w-full h-full object-cover"
-                          muted
-                          preload="metadata"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                          <Play className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                        </div>
-                      </div>
+                      <HoverCard openDelay={200} closeDelay={100}>
+                        <HoverCardTrigger asChild>
+                          <div className="w-16 h-10 sm:w-20 sm:h-14 relative rounded overflow-hidden bg-muted cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                            <video src={item.video_item} className="w-full h-full object-cover" muted preload="metadata" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <Play className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                            </div>
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent side="right" className="w-80 p-2">
+                          <video src={item.video_item} controls className="w-full rounded" preload="metadata" />
+                        </HoverCardContent>
+                      </HoverCard>
                     )}
                   </div>
                   
@@ -515,6 +547,26 @@ const ConsultarEstoque = () => {
                         </div>
                       </div>
                     </div>
+
+                    {/* Galeria de Imagens */}
+                    {(() => {
+                      const imgs = parseImageUrls(item.imagem_item);
+                      return (imgs.length > 0 || item.video_item) ? (
+                        <div className="pt-3 border-t">
+                          <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
+                            <Images className="h-3.5 w-3.5" />
+                            Galeria ({imgs.length} foto{imgs.length !== 1 ? 's' : ''}{item.video_item ? ' • 1 vídeo' : ''})
+                          </h4>
+                          <div className="grid grid-cols-4 gap-1.5">
+                            {imgs.map((url, i) => (
+                              <div key={i} className="relative rounded overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
+                                <ImageZoom src={url} alt={`${item.nome_item} ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null;
+                    })()}
 
                     {/* Timeline de Movimentações - Preview */}
                     <div className="pt-3 border-t">
