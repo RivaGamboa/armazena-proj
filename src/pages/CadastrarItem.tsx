@@ -895,6 +895,44 @@ const CadastrarItem = () => {
           onClose={() => setShowScanner(false)}
           onScan={handleScanResult}
         />
+
+        {/* Add Categoria Dialog */}
+        <Dialog open={showAddCategoria} onOpenChange={setShowAddCategoria}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Nova Categoria</DialogTitle></DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div className="flex gap-2">
+                <Input value={newCategoriaName} onChange={(e) => setNewCategoriaName(e.target.value)} placeholder="Nome da categoria" className="h-12 flex-1" />
+                <Button type="button" variant={isListeningCategoria ? "destructive" : "outline"} size="icon" className="h-12 w-12 shrink-0" onClick={() => toggleVoiceEnum('categoria')}>
+                  {isListeningCategoria ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => handleAddEnum('categoria')} disabled={savingEnum} className="flex-1 h-12">{savingEnum ? "Salvando..." : "Salvar"}</Button>
+                <Button variant="outline" onClick={() => setShowAddCategoria(false)} className="h-12">Cancelar</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Alocação Dialog */}
+        <Dialog open={showAddAlocacao} onOpenChange={setShowAddAlocacao}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Nova Alocação</DialogTitle></DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div className="flex gap-2">
+                <Input value={newAlocacaoName} onChange={(e) => setNewAlocacaoName(e.target.value)} placeholder="Nome da alocação" className="h-12 flex-1" />
+                <Button type="button" variant={isListeningAlocacao ? "destructive" : "outline"} size="icon" className="h-12 w-12 shrink-0" onClick={() => toggleVoiceEnum('alocacao')}>
+                  {isListeningAlocacao ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => handleAddEnum('alocacao')} disabled={savingEnum} className="flex-1 h-12">{savingEnum ? "Salvando..." : "Salvar"}</Button>
+                <Button variant="outline" onClick={() => setShowAddAlocacao(false)} className="h-12">Cancelar</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
