@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus, Mic, MicOff, Star } from "lucide-react";
+import { ArrowLeft, Camera, Video, Tag, ScanBarcode, X, ImagePlus, Mic, MicOff, Star, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import QRCodeSVG from "react-qr-code";
@@ -17,7 +17,11 @@ import { ItemPreview } from "@/components/ItemPreview";
 import { SavedItemPreview } from "@/components/SavedItemPreview";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useCustomEnums } from "@/hooks/useCustomEnums";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Constants } from "@/integrations/supabase/types";
+
+// Remove the unused import since we use dynamic enums
+
 
 const MAX_PHOTOS = 4;
 
@@ -54,7 +58,7 @@ const CadastrarItem = () => {
   const [showLabelGenerator, setShowLabelGenerator] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [savedItem, setSavedItem] = useState<SavedItem | null>(null);
-  const { categorias, alocacoes, statusList, loading: enumsLoading } = useCustomEnums();
+  const { categorias, alocacoes, statusList, loading: enumsLoading, refetch } = useCustomEnums();
   
   const DEFAULT_STATUS_OPTIONS = ['ITEM NOVO', 'ITEM USADO', 'ITEM USADO COM AVARIA', 'AVARIA/DESCARTE'];
   
@@ -67,6 +71,62 @@ const CadastrarItem = () => {
   const statusOptions = statusList.length > 0 
     ? statusList.map(s => s.nome) 
     : DEFAULT_STATUS_OPTIONS;
+
+  // Inline add dialogs
+  const [showAddCategoria, setShowAddCategoria] = useState(false);
+  const [showAddAlocacao, setShowAddAlocacao] = useState(false);
+  const [newCategoriaName, setNewCategoriaName] = useState("");
+  const [newAlocacaoName, setNewAlocacaoName] = useState("");
+  const [savingEnum, setSavingEnum] = useState(false);
+  const [isListeningCategoria, setIsListeningCategoria] = useState(false);
+  const [isListeningAlocacao, setIsListeningAlocacao] = useState(false);
+  const recognitionCategoriaRef = useRef<any>(null);
+  const recognitionAlocacaoRef = useRef<any>(null);
+
+  const toggleVoiceEnum = (field: 'categoria' | 'alocacao') => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) { toast.error("Navegador não suporta voz."); return; }
+    const isCat = field === 'categoria';
+    const listening = isCat ? isListeningCategoria : isListeningAlocacao;
+    const setListening = isCat ? setIsListeningCategoria : setIsListeningAlocacao;
+    const refObj = isCat ? recognitionCategoriaRef : recognitionAlocacaoRef;
+    const setter = isCat ? setNewCategoriaName : setNewAlocacaoName;
+    if (listening) { refObj.current?.stop(); setListening(false); return; }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR"; recognition.continuous = false; recognition.interimResults = false;
+    refObj.current = recognition;
+    recognition.onresult = (event: any) => {
+      const t = capitalizarTexto(event.results[0][0].transcript);
+      setter(prev => prev ? prev + " " + t : t);
+      setListening(false);
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+    recognition.start(); setListening(true);
+  };
+
+  const handleAddEnum = async (type: 'categoria' | 'alocacao') => {
+    const name = type === 'categoria' ? newCategoriaName.trim() : newAlocacaoName.trim();
+    if (!name) { toast.error("Nome é obrigatório"); return; }
+    setSavingEnum(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Não autenticado");
+      const table = type === 'categoria' ? 'categorias_item' : 'alocacoes';
+      const { error } = await supabase.from(table).insert([{ nome: name, user_id: user.id }]);
+      if (error) throw error;
+      await refetch();
+      setFormData(prev => ({
+        ...prev,
+        ...(type === 'categoria' ? { categoria_item: name } : { alocacao: name }),
+      }));
+      toast.success(`${type === 'categoria' ? 'Categoria' : 'Alocação'} adicionada!`);
+      if (type === 'categoria') { setShowAddCategoria(false); setNewCategoriaName(""); }
+      else { setShowAddAlocacao(false); setNewAlocacaoName(""); }
+    } catch (error: any) {
+      toast.error(error.code === "23505" ? "Já existe com este nome" : "Erro ao salvar");
+    } finally { setSavingEnum(false); }
+  };
 
   const [formData, setFormData] = useState({
     sku: "",
@@ -569,19 +629,24 @@ const CadastrarItem = () => {
 
           <div>
             <Label htmlFor="categoria">Categoria *</Label>
-            <Select 
-              value={formData.categoria_item}
-              onValueChange={(value) => setFormData({ ...formData, categoria_item: value })}
-            >
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categoriaOptions.map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select 
+                value={formData.categoria_item}
+                onValueChange={(value) => setFormData({ ...formData, categoria_item: value })}
+              >
+                <SelectTrigger className="h-12 flex-1">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categoriaOptions.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="button" variant="outline" size="icon" className="h-12 w-12 shrink-0" onClick={() => setShowAddCategoria(true)} title="Nova categoria">
+                <Plus className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
           <div>
@@ -609,19 +674,24 @@ const CadastrarItem = () => {
 
           <div>
             <Label htmlFor="alocacao">Alocação *</Label>
-            <Select 
-              value={formData.alocacao}
-              onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
-            >
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="Selecione uma alocação" />
-              </SelectTrigger>
-              <SelectContent>
-                {alocacaoOptions.map((aloc) => (
-                  <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select 
+                value={formData.alocacao}
+                onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
+              >
+                <SelectTrigger className="h-12 flex-1">
+                  <SelectValue placeholder="Selecione uma alocação" />
+                </SelectTrigger>
+                <SelectContent>
+                  {alocacaoOptions.map((aloc) => (
+                    <SelectItem key={aloc} value={aloc}>{aloc}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="button" variant="outline" size="icon" className="h-12 w-12 shrink-0" onClick={() => setShowAddAlocacao(true)} title="Nova alocação">
+                <Plus className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Quantidades por Status */}
@@ -825,6 +895,44 @@ const CadastrarItem = () => {
           onClose={() => setShowScanner(false)}
           onScan={handleScanResult}
         />
+
+        {/* Add Categoria Dialog */}
+        <Dialog open={showAddCategoria} onOpenChange={setShowAddCategoria}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Nova Categoria</DialogTitle></DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div className="flex gap-2">
+                <Input value={newCategoriaName} onChange={(e) => setNewCategoriaName(e.target.value)} placeholder="Nome da categoria" className="h-12 flex-1" />
+                <Button type="button" variant={isListeningCategoria ? "destructive" : "outline"} size="icon" className="h-12 w-12 shrink-0" onClick={() => toggleVoiceEnum('categoria')}>
+                  {isListeningCategoria ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => handleAddEnum('categoria')} disabled={savingEnum} className="flex-1 h-12">{savingEnum ? "Salvando..." : "Salvar"}</Button>
+                <Button variant="outline" onClick={() => setShowAddCategoria(false)} className="h-12">Cancelar</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Alocação Dialog */}
+        <Dialog open={showAddAlocacao} onOpenChange={setShowAddAlocacao}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Nova Alocação</DialogTitle></DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div className="flex gap-2">
+                <Input value={newAlocacaoName} onChange={(e) => setNewAlocacaoName(e.target.value)} placeholder="Nome da alocação" className="h-12 flex-1" />
+                <Button type="button" variant={isListeningAlocacao ? "destructive" : "outline"} size="icon" className="h-12 w-12 shrink-0" onClick={() => toggleVoiceEnum('alocacao')}>
+                  {isListeningAlocacao ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => handleAddEnum('alocacao')} disabled={savingEnum} className="flex-1 h-12">{savingEnum ? "Salvando..." : "Salvar"}</Button>
+                <Button variant="outline" onClick={() => setShowAddAlocacao(false)} className="h-12">Cancelar</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
