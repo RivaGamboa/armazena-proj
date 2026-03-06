@@ -633,7 +633,7 @@ const CadastrarItem = () => {
                 onValueChange={(value) => setFormData({ ...formData, categoria_item: value })}
               >
                 <SelectTrigger className="h-12 flex-1">
-                  <SelectValue placeholder="Selecione uma categoria" />
+                  <SelectValue placeholder="Escolha na lista ou crie novo" />
                 </SelectTrigger>
                 <SelectContent>
                   {categoriaOptions.map((cat) => (
