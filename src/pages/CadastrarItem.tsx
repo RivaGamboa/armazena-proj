@@ -96,7 +96,7 @@ const CadastrarItem = () => {
     recognition.lang = "pt-BR"; recognition.continuous = false; recognition.interimResults = false;
     refObj.current = recognition;
     recognition.onresult = (event: any) => {
-      const t = capitalizarTexto(event.results[0][0].transcript);
+      const t = event.results[0][0].transcript.toUpperCase();
       setter(prev => prev ? prev + " " + t : t);
       setListening(false);
     };
