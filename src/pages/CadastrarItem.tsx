@@ -106,7 +106,7 @@ const CadastrarItem = () => {
   };
 
   const handleAddEnum = async (type: 'categoria' | 'alocacao') => {
-    const name = type === 'categoria' ? newCategoriaName.trim() : newAlocacaoName.trim();
+    const name = (type === 'categoria' ? newCategoriaName.trim() : newAlocacaoName.trim()).toUpperCase();
     if (!name) { toast.error("Nome é obrigatório"); return; }
     setSavingEnum(true);
     try {
