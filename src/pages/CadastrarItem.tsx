@@ -678,7 +678,7 @@ const CadastrarItem = () => {
                 onValueChange={(value) => setFormData({ ...formData, alocacao: value })}
               >
                 <SelectTrigger className="h-12 flex-1">
-                  <SelectValue placeholder="Selecione uma alocação" />
+                  <SelectValue placeholder="Escolha na lista ou crie novo" />
                 </SelectTrigger>
                 <SelectContent>
                   {alocacaoOptions.map((aloc) => (
