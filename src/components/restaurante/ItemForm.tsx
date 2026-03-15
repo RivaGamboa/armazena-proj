@@ -59,9 +59,9 @@ export const ItemForm = ({ open, onClose, onSubmit, item, categorias }: ItemForm
         data_aquisicao: item.data_aquisicao || new Date().toISOString().split('T')[0],
         codigo_barras: item.codigo_barras || '',
         status: item.status,
-        largura_cm: item.largura_cm ?? '',
-        altura_cm: item.altura_cm ?? '',
-        profundidade_cm: item.profundidade_cm ?? ''
+        largura_cm: item.largura_cm && item.largura_cm !== 0 ? item.largura_cm : '',
+        altura_cm: item.altura_cm && item.altura_cm !== 0 ? item.altura_cm : '',
+        profundidade_cm: item.profundidade_cm && item.profundidade_cm !== 0 ? item.profundidade_cm : ''
       });
       setGalleryImages(item.galeria_fotos || (item.foto_url ? [item.foto_url] : []));
       setFeaturedIndex(item.foto_destaque_index || 0);
