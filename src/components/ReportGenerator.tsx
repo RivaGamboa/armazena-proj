@@ -64,7 +64,15 @@ export const ReportGenerator = ({ stats }: ReportGeneratorProps) => {
       if (selectedFields.nome) row["Nome"] = item.nome_item;
       if (selectedFields.sku) row["SKU"] = item.sku;
       if (selectedFields.categoria) row["Categoria"] = item.categoria_item;
-      if (selectedFields.status) row["Status"] = item.status_item;
+      if (selectedFields.status) {
+        // Derive real status from quantities instead of using default status_item field
+        const statusParts: string[] = [];
+        if (item.quantidade_novo > 0) statusParts.push(`NOVO(${item.quantidade_novo})`);
+        if (item.quantidade_usado > 0) statusParts.push(`USADO(${item.quantidade_usado})`);
+        if (item.quantidade_danificado > 0) statusParts.push(`DANIFICADO(${item.quantidade_danificado})`);
+        if (item.quantidade_em_manutencao > 0) statusParts.push(`EM MANUTENÇÃO(${item.quantidade_em_manutencao})`);
+        row["Status"] = statusParts.length > 0 ? statusParts.join(" / ") : "Sem estoque";
+      }
       if (selectedFields.alocacao) row["Alocação"] = item.alocacao;
       if (selectedFields.quantidade) {
         row["Qtd. Novo"] = item.quantidade_novo;
