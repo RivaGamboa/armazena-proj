@@ -628,7 +628,13 @@ const ConsultarEstoque = () => {
                           }
 
                           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-                          window.open(whatsappUrl, '_blank');
+                          const a = document.createElement('a');
+                          a.href = whatsappUrl;
+                          a.target = '_blank';
+                          a.rel = 'noopener noreferrer';
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
                         }}
                       >
                         <Share2 className="h-4 w-4" />
