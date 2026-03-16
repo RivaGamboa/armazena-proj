@@ -573,18 +573,68 @@ const ConsultarEstoque = () => {
                       <MovementTimeline itemId={item.id_item} />
                     </div>
 
-                    {/* Ver Detalhes Completos */}
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 mt-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/item/${item.id_item}`);
-                      }}
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Ver Detalhes Completos
-                    </Button>
+                    {/* Ações */}
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 gap-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/item/${item.id_item}`);
+                        }}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Ver Detalhes
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 gap-2 text-green-600 border-green-500/30 hover:bg-green-500/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const imgs = parseImageUrls(item.imagem_item);
+                          const qps = item.quantidades_por_status as Record<string, number> | null;
+                          const qtdText = qps
+                            ? Object.entries(qps).filter(([_, v]) => (v as number) > 0).map(([s, q]) => `  • ${s}: ${q}`).join('\n')
+                            : `  • Novo: ${item.quantidade_novo}\n  • Usado: ${item.quantidade_usado}\n  • Danificado: ${item.quantidade_danificado}`;
+                          const totalQtd = qps
+                            ? Object.values(qps).reduce((s: number, v: number) => s + (v || 0), 0)
+                            : (item.quantidade_total ?? (item.quantidade_novo + item.quantidade_usado + item.quantidade_danificado));
+
+                          let msg = `📦 *${item.nome_item}*\n\n`;
+                          if (item.sku) msg += `🏷️ SKU: ${item.sku}\n`;
+                          msg += `📁 Categoria: ${item.categoria_item}\n`;
+                          msg += `📌 Status: ${item.status_item}\n`;
+                          msg += `📍 Alocação: ${item.alocacao}\n\n`;
+                          msg += `📊 *Quantidades* (Total: ${totalQtd})\n${qtdText}\n`;
+
+                          if (item.comprimento_cm || item.largura_cm || item.profundidade_cm) {
+                            msg += `\n📐 Dimensões: ${item.comprimento_cm || '-'} × ${item.largura_cm || '-'} × ${item.profundidade_cm || '-'} cm`;
+                          }
+                          if (item.peso_kg) {
+                            msg += `\n⚖️ Peso: ${item.peso_kg} kg`;
+                          }
+
+                          msg += `\n📅 Cadastro: ${new Date(item.data_cadastro).toLocaleDateString('pt-BR')}`;
+
+                          if (imgs.length > 0) {
+                            msg += `\n\n🖼️ *Galeria de Imagens (${imgs.length})*`;
+                            imgs.forEach((url, i) => {
+                              msg += `\nFoto ${i + 1}: ${url}`;
+                            });
+                          }
+
+                          if (item.video_item) {
+                            msg += `\n\n🎬 Vídeo: ${item.video_item}`;
+                          }
+
+                          const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+                          window.open(whatsappUrl, '_blank');
+                        }}
+                      >
+                        <Share2 className="h-4 w-4" />
+                        WhatsApp
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
