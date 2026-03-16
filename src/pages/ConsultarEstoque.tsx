@@ -487,9 +487,6 @@ const ConsultarEstoque = () => {
                     <h3 className="font-semibold text-sm sm:text-lg truncate">{item.nome_item}</h3>
                     <p className="text-xs sm:text-sm text-muted-foreground">{item.categoria_item}</p>
                     <div className="flex gap-1 sm:gap-2 mt-1 sm:mt-2 text-xs flex-wrap">
-                      <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-primary/10 text-primary rounded">
-                        {item.status_item}
-                      </span>
                       <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-500/10 text-blue-600 rounded">
                         {item.alocacao}
                       </span>
