@@ -57,7 +57,7 @@ const ConsultarEstoque = () => {
   const [filteredItens, setFilteredItens] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
-  const [expandedItem, setExpandedItem] = useState<number | null>(null);
+  // expandedItem removed - cards now navigate directly to /item/:id
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFiltersState>(initialFilters);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
