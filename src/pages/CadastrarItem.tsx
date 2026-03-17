@@ -17,6 +17,7 @@ import { ItemPreview } from "@/components/ItemPreview";
 import { SavedItemPreview } from "@/components/SavedItemPreview";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useCustomEnums } from "@/hooks/useCustomEnums";
+import { compressImages } from "@/lib/imageCompression";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Constants } from "@/integrations/supabase/types";
 
