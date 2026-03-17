@@ -356,7 +356,7 @@ const ItemDetails = () => {
             )}
 
             {/* Dimensions & Weight */}
-            {(item.comprimento_cm || item.largura_cm || item.profundidade_cm || item.peso_kg) && (
+            {!!(item.comprimento_cm || item.largura_cm || item.profundidade_cm || item.peso_kg) && (
               <Card className="p-4">
                 <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                   <Ruler className="h-4 w-4 text-primary" />
