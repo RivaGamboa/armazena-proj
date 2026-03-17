@@ -427,26 +427,30 @@ const ItemDetails = () => {
                      return imgs.length > 0 ? (
                        <div className="space-y-3">
                          {/* Featured image */}
-                         <div className="relative rounded-lg overflow-hidden bg-muted border-2 border-primary/20" style={{ aspectRatio: '16/10' }}>
-                           <ImageZoom
-                             src={imgs[0]}
-                             alt={`${item.nome_item} - Destaque`}
-                             className="absolute inset-0 w-full h-full object-cover"
-                           />
-                           <div className="absolute top-2 left-2 bg-primary/80 text-primary-foreground text-xs px-2 py-0.5 rounded">
-                             Destaque
-                           </div>
-                         </div>
-                         {/* Remaining images */}
-                         {imgs.length > 1 && (
-                           <div className="grid grid-cols-3 gap-2">
-                             {imgs.slice(1).map((url, i) => (
-                               <div key={i} className="relative rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
-                                 <ImageZoom
-                                   src={url}
-                                   alt={`${item.nome_item} - Foto ${i + 2}`}
-                                   className="absolute inset-0 w-full h-full object-cover"
-                                 />
+                       <div className="relative rounded-lg overflow-hidden bg-muted border-2 border-primary/20" style={{ aspectRatio: '16/10' }}>
+                            <ImageZoom
+                              src={imgs[0]}
+                              alt={`${item.nome_item} - Destaque`}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              gallery={imgs}
+                              galleryIndex={0}
+                            />
+                            <div className="absolute top-2 left-2 bg-primary/80 text-primary-foreground text-xs px-2 py-0.5 rounded">
+                              Destaque
+                            </div>
+                          </div>
+                          {/* Remaining images */}
+                          {imgs.length > 1 && (
+                            <div className="grid grid-cols-3 gap-2">
+                              {imgs.slice(1).map((url, i) => (
+                                <div key={i} className="relative rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '1/1' }}>
+                                  <ImageZoom
+                                    src={url}
+                                    alt={`${item.nome_item} - Foto ${i + 2}`}
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                    gallery={imgs}
+                                    galleryIndex={i + 1}
+                                  />
                                </div>
                              ))}
                            </div>
