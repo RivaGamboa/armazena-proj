@@ -390,10 +390,13 @@ const CadastrarItem = () => {
       const allImageUrls = [...existingImageUrls];
       let videoUrl = existingVideoUrl;
 
-      // Upload new photos
-      for (const file of imagemFiles) {
+      // Compress and upload new photos as WebP 1080x1080
+      const compressedFiles = await compressImages(imagemFiles);
+      for (const file of compressedFiles) {
         const path = `${user.id}/${Date.now()}_${file.name}`;
-        const { error } = await supabase.storage.from('item-photos').upload(path, file);
+        const { error } = await supabase.storage.from('item-photos').upload(path, file, {
+          contentType: 'image/webp',
+        });
         if (error) throw error;
         const { data: { publicUrl } } = supabase.storage.from('item-photos').getPublicUrl(path);
         allImageUrls.push(publicUrl);
