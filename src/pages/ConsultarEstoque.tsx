@@ -506,7 +506,9 @@ const ConsultarEstoque = () => {
                   </div>
                 </div>
 
-            )})}
+              </div>
+              )})}
+
           </div>
         )}
       </div>
