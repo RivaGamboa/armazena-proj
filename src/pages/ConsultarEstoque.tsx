@@ -383,7 +383,7 @@ const ConsultarEstoque = () => {
                         : [...prev, item.id_item]
                     );
                   } else {
-                    setExpandedItem(expandedItem === item.id_item ? null : item.id_item);
+                    navigate(`/item/${item.id_item}`);
                   }
                 }}
               >
