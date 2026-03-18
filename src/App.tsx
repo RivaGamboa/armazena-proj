@@ -15,6 +15,7 @@ import DevolverItem from "./pages/DevolverItem";
 import Dashboard from "./pages/Dashboard";
 import ItemDetails from "./pages/ItemDetails";
 import RestauranteApp from "./pages/RestauranteApp";
+import GuestView from "./pages/GuestView";
 
 const queryClient = new QueryClient();
 
