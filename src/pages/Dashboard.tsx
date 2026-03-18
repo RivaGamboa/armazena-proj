@@ -11,6 +11,7 @@ import { useCustomEnums } from "@/hooks/useCustomEnums";
 import { EnumManager } from "@/components/EnumManager";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ReportGenerator } from "@/components/ReportGenerator";
+import { InviteManager } from "@/components/InviteManager";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
