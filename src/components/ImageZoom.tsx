@@ -50,10 +50,10 @@ export const ImageZoom = ({ src, alt, className, gallery, galleryIndex = 0 }: Im
             <Button
               variant="ghost"
               size="icon"
-              className="absolute left-2 sm:left-4 z-10 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
+              className="absolute left-2 sm:left-4 z-10 h-12 w-12 sm:h-10 sm:w-10 rounded-full bg-black/60 hover:bg-black/80 text-white shadow-lg"
               onClick={prev}
             >
-              <ChevronLeft className="h-6 w-6" />
+              <ChevronLeft className="h-7 w-7 sm:h-6 sm:w-6" />
             </Button>
           )}
 
@@ -67,10 +67,10 @@ export const ImageZoom = ({ src, alt, className, gallery, galleryIndex = 0 }: Im
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 sm:right-4 z-10 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
+              className="absolute right-2 sm:right-4 z-10 h-12 w-12 sm:h-10 sm:w-10 rounded-full bg-black/60 hover:bg-black/80 text-white shadow-lg"
               onClick={next}
             >
-              <ChevronRight className="h-6 w-6" />
+              <ChevronRight className="h-7 w-7 sm:h-6 sm:w-6" />
             </Button>
           )}
 
