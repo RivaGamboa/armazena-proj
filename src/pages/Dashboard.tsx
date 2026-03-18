@@ -61,17 +61,25 @@ const Dashboard = () => {
         value,
       }));
 
-      const statuses = itens.reduce((acc: any, item: any) => {
-        const status = item.status_item;
-        if (!acc[status]) acc[status] = 0;
-        acc[status] += 1;
-        return acc;
-      }, {});
+      // Aggregate real quantities from quantidades_por_status JSON
+      const statusQuantities: Record<string, number> = {};
+      itens.forEach((item: any) => {
+        const qps = item.quantidades_por_status as Record<string, number> | null;
+        if (qps && typeof qps === 'object') {
+          for (const [statusName, qty] of Object.entries(qps)) {
+            if (typeof qty === 'number' && qty > 0) {
+              statusQuantities[statusName] = (statusQuantities[statusName] || 0) + qty;
+            }
+          }
+        }
+      });
 
-      const porStatus = Object.entries(statuses).map(([name, value]) => ({
+      const porStatus = Object.entries(statusQuantities).map(([name, value]) => ({
         name,
         value,
       }));
+
+      const statuses = statusQuantities;
 
       const alocacoesCount = itens.reduce((acc: any, item: any) => {
         const aloc = item.alocacao;
