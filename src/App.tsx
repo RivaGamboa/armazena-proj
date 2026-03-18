@@ -36,6 +36,7 @@ const App = () => (
             <Route path="/item/:id" element={<ItemDetails />} />
             <Route path="/retirar" element={<RetirarItem />} />
             <Route path="/devolver" element={<DevolverItem />} />
+            <Route path="/convidado/:token" element={<GuestView />} />
             {/* RestauraStock - New Restaurant Inventory System */}
             <Route path="/restaurante" element={<RestauranteApp />} />
             <Route path="/restaurante/*" element={<RestauranteApp />} />
