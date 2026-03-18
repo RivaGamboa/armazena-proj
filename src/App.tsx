@@ -15,6 +15,7 @@ import DevolverItem from "./pages/DevolverItem";
 import Dashboard from "./pages/Dashboard";
 import ItemDetails from "./pages/ItemDetails";
 import RestauranteApp from "./pages/RestauranteApp";
+import GuestView from "./pages/GuestView";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/item/:id" element={<ItemDetails />} />
             <Route path="/retirar" element={<RetirarItem />} />
             <Route path="/devolver" element={<DevolverItem />} />
+            <Route path="/convidado/:token" element={<GuestView />} />
             {/* RestauraStock - New Restaurant Inventory System */}
             <Route path="/restaurante" element={<RestauranteApp />} />
             <Route path="/restaurante/*" element={<RestauranteApp />} />

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Package, TrendingUp, AlertCircle, MapPin, Settings, FileBarChart } from "lucide-react";
+import { ArrowLeft, Package, TrendingUp, AlertCircle, MapPin, Settings, FileBarChart, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
@@ -11,6 +11,7 @@ import { useCustomEnums } from "@/hooks/useCustomEnums";
 import { EnumManager } from "@/components/EnumManager";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ReportGenerator } from "@/components/ReportGenerator";
+import { InviteManager } from "@/components/InviteManager";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -150,17 +151,23 @@ const Dashboard = () => {
           </div>
         ) : (
           <Tabs defaultValue="estatisticas" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-3 h-10 sm:h-12 p-1 bg-muted/50 rounded-xl">
+            <TabsList className="grid w-full grid-cols-4 h-10 sm:h-12 p-1 bg-muted/50 rounded-xl">
               <TabsTrigger value="estatisticas" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                Estatísticas
+                <span className="hidden sm:inline">Estatísticas</span>
+                <span className="sm:hidden">Stats</span>
               </TabsTrigger>
               <TabsTrigger value="relatorios" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                <FileBarChart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <FileBarChart className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 <span className="hidden sm:inline">Relatórios</span>
                 <span className="sm:hidden">Relat.</span>
               </TabsTrigger>
+              <TabsTrigger value="convites" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">Convites</span>
+                <span className="sm:hidden">Conv.</span>
+              </TabsTrigger>
               <TabsTrigger value="configuracoes" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 <span className="hidden sm:inline">Configurações</span>
                 <span className="sm:hidden">Config.</span>
               </TabsTrigger>
@@ -318,6 +325,10 @@ const Dashboard = () => {
 
             <TabsContent value="relatorios" className="space-y-4 sm:space-y-6 animate-fade-in">
               <ReportGenerator stats={stats} />
+            </TabsContent>
+
+            <TabsContent value="convites" className="space-y-4 sm:space-y-6 animate-fade-in">
+              <InviteManager />
             </TabsContent>
 
             <TabsContent value="configuracoes" className="space-y-6 animate-fade-in">
