@@ -151,17 +151,23 @@ const Dashboard = () => {
           </div>
         ) : (
           <Tabs defaultValue="estatisticas" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-3 h-10 sm:h-12 p-1 bg-muted/50 rounded-xl">
+            <TabsList className="grid w-full grid-cols-4 h-10 sm:h-12 p-1 bg-muted/50 rounded-xl">
               <TabsTrigger value="estatisticas" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                Estatísticas
+                <span className="hidden sm:inline">Estatísticas</span>
+                <span className="sm:hidden">Stats</span>
               </TabsTrigger>
               <TabsTrigger value="relatorios" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                <FileBarChart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <FileBarChart className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 <span className="hidden sm:inline">Relatórios</span>
                 <span className="sm:hidden">Relat.</span>
               </TabsTrigger>
+              <TabsTrigger value="convites" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">Convites</span>
+                <span className="sm:hidden">Conv.</span>
+              </TabsTrigger>
               <TabsTrigger value="configuracoes" className="rounded-lg text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 <span className="hidden sm:inline">Configurações</span>
                 <span className="sm:hidden">Config.</span>
               </TabsTrigger>
