@@ -327,6 +327,10 @@ const Dashboard = () => {
               <ReportGenerator stats={stats} />
             </TabsContent>
 
+            <TabsContent value="convites" className="space-y-4 sm:space-y-6 animate-fade-in">
+              <InviteManager />
+            </TabsContent>
+
             <TabsContent value="configuracoes" className="space-y-6 animate-fade-in">
               <Tabs defaultValue="categorias" className="space-y-4">
                 <TabsList className="grid w-full grid-cols-3 bg-muted/50">
