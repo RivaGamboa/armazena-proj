@@ -104,6 +104,39 @@ export type Database = {
         }
         Relationships: []
       }
+      convites_acesso: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          expira_em: string
+          id: string
+          nivel_acesso: string
+          nome_convidado: string | null
+          token: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          expira_em: string
+          id?: string
+          nivel_acesso?: string
+          nome_convidado?: string | null
+          token?: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          expira_em?: string
+          id?: string
+          nivel_acesso?: string
+          nome_convidado?: string | null
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       historico_movimentacoes: {
         Row: {
           alocacao_anterior: string | null
