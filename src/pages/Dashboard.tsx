@@ -139,7 +139,7 @@ const Dashboard = () => {
             <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold flex-1 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent truncate">
-            Dashboard de Estoque
+            Dashboard de Inventário
           </h1>
           <ThemeToggle />
         </div>
