@@ -1,19 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileText, PackageMinus, PackagePlus, Search, LogOut, BarChart3 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { FileText, PackageMinus, PackagePlus, Search, BarChart3 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const MenuPrincipal = () => {
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast.success("Logout realizado com sucesso");
-    navigate("/auth");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-3 sm:p-4 md:p-6">
@@ -78,15 +70,6 @@ const MenuPrincipal = () => {
             <span className="sm:hidden">CADASTRAR/EDITAR</span>
           </Button>
         </div>
-
-        <Button
-          onClick={handleLogout}
-          variant="ghost"
-          className="w-full mt-4 sm:mt-6 text-muted-foreground hover:text-foreground touch-target"
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Sair
-        </Button>
       </div>
     </div>
   );
